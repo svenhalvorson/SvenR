@@ -6,11 +6,17 @@
 \usage{
 scols(df)
 }
+\arguments{
+\item{df}{a data frame}
+}
 \description{
 Useful for finding colum names
 }
 \note{
 For interactive use
+}
+\examples{
+scols(mtcars)
 }
 \author{
 Sven Halvorson

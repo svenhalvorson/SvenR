@@ -2,8 +2,11 @@
 #' @description Useful for finding colum names
 #' @note For interactive use
 #' @author Sven Halvorson
+#' @examples
+#' scols(mtcars)
+#' @export
 
 scols = function(df){
-  #' @df a data frame
+  #' @param df a data frame
   sort(colnames(df))
 }

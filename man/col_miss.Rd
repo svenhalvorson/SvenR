@@ -17,6 +17,16 @@ Count missing values by column
 \note{
 Likely to be used interactively
 }
+\examples{
+set.seed(1)
+dat = c('X', 'Y', 'Z', '', NA)
+df = tibble(a = sample(dat, size = 5, replace = TRUE),
+            b = sample(dat, size = 5, replace = TRUE),
+            c = sample(dat, size = 5, replace = TRUE))
+df
+col_miss(df)
+col_miss(df, empty_string = TRUE)
+}
 \author{
 Sven Halvorson
 }

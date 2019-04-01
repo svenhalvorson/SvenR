@@ -1,6 +1,10 @@
 #' Pad MRNs
 #' @description adds leading zeroes to numeric vector
 #' @author Sven Halvorson
+#' @examples
+#' mrns = c(11111111, 222222, 33333)
+#' pad_mrn(mrns)
+#' @export
 pad_mrn = function(x){
 
   #' @param x atomic vector

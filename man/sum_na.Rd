@@ -12,6 +12,9 @@ sum_na(x)
 \description{
 Sum Missing Values
 }
+\examples{
+sum_na(c(1, NA, 2, NA, 3, NA))
+}
 \author{
 Sven Halvorson
 }

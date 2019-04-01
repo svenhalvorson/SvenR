@@ -4,12 +4,12 @@
 \alias{find_cols}
 \title{Find Columns}
 \usage{
-find_cols(df, pattern, value = TRUE, ignore.case = TRUE)
+find_cols(df, ..., value = TRUE, ignore.case = TRUE)
 }
 \arguments{
 \item{df}{A data frame}
 
-\item{pattern}{A regular expression}
+\item{...}{Regular expressions, quoted or not}
 
 \item{value}{Should the column names or positions be returned?}
 
@@ -20,6 +20,10 @@ Find columns in a data frame by regular expression
 }
 \note{
 This is mostly for interactive use
+}
+\examples{
+find_cols(mtcars, ar, pg)
+find_cols(mtcars, 'ar', value = FALSE)
 }
 \author{
 Sven Halvorson

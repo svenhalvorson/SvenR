@@ -12,6 +12,10 @@ pad_mrn(x)
 \description{
 adds leading zeroes to numeric vector
 }
+\examples{
+mrns = c(11111111, 222222, 33333)
+pad_mrn(mrns)
+}
 \author{
 Sven Halvorson
 }

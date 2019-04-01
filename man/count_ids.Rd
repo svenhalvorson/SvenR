@@ -20,6 +20,13 @@ Computes \code{n_distinct} on specified columns and gives row count.
 \note{
 Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied.
 }
+\examples{
+df = tibble(op_sys = 1:5,
+            visit_sys = c(1, 1, 2, 3, 4),
+            patient_sys = c(1, 1, 2, 2, 3))
+count_ids(df)
+count_ids(df, op_sys)
+}
 \author{
 Sven Halvorson
 }

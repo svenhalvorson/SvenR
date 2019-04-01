@@ -26,6 +26,11 @@ if any, determine a unique key for \code{df}. If any do, they will be listed.
 Othewise, the closest key(s) will be listed. The output in this case
 is a data frame of statistics on the attempts.
 }
+\examples{
+check_id(mtcars)
+check_id(mtcars, cyl, mpg)
+check_id(mtcars, c('cyl', 'mpg'))
+}
 \author{
 Sven Halvorson
 }

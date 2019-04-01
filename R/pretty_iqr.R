@@ -1,6 +1,9 @@
 #' Pretty IQR
 #' @description Formatted character version of median, Q1, Q3
 #' @author Sven Halvorson
+#' @examples
+#' pretty_iqr(mtcars$mpg)
+#' @export
 
 pretty_iqr = function(x, digits = 1, na.rm = TRUE){
   #' @param x Numeric vector

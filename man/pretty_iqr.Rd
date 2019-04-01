@@ -16,6 +16,9 @@ pretty_iqr(x, digits = 1, na.rm = TRUE)
 \description{
 Formatted character version of median, Q1, Q3
 }
+\examples{
+pretty_iqr(mtcars$mpg)
+}
 \author{
 Sven Halvorson
 }

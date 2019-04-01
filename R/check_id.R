@@ -2,6 +2,11 @@
 #' Check IDs
 #' @description Test keys for uniqueness or try to find unique keys
 #' @author Sven Halvorson
+#' @examples
+#' check_id(mtcars)
+#' check_id(mtcars, cyl, mpg)
+#' check_id(mtcars, c('cyl', 'mpg'))
+#' @export
 
 check_id = function(df, ..., max_depth = 3){
 
@@ -33,7 +38,8 @@ check_id = function(df, ..., max_depth = 3){
     if(str_detect(string = arguments, pattern = 'c\\(')){
       arguments = arguments %>%
         str_remove_all('c\\(|\\)|\"') %>%
-        str_split(pattern = ', ', simplify = TRUE)}
+        str_split(pattern = ', ', simplify = TRUE) %>%
+        .[1,]}
   }
 
   if(length(arguments) > 0){

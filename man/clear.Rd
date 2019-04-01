@@ -15,6 +15,9 @@ Clears specified environment and console
 \note{
 This does not remove loaded package. Restart your R session before getting the final output.
 }
+\examples{
+clear()
+}
 \author{
 Sven Halvorson
 }

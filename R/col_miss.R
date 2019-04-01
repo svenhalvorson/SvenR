@@ -2,6 +2,16 @@
 #' @description Count missing values by column
 #' @note Likely to be used interactively
 #' @author Sven Halvorson
+#' @examples
+#' set.seed(1)
+#' dat = c('X', 'Y', 'Z', '', NA)
+#' df = tibble(a = sample(dat, size = 5, replace = TRUE),
+#'             b = sample(dat, size = 5, replace = TRUE),
+#'             c = sample(dat, size = 5, replace = TRUE))
+#' df
+#' col_miss(df)
+#' col_miss(df, empty_string = TRUE)
+#' @export
 col_miss = function(df, empty_string = FALSE){
   #' @param df A data frame
   #' @param empty_string Should only white space values be treated as NA?

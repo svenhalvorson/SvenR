@@ -1,6 +1,12 @@
 #' Fill Down
 #' @description Fill missing value with most recent non-missing value
 #' @author Sven Halvorson
+#' @examples
+#' NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+#' fill_down(NM)
+#' fill_down(NM, empty_string = TRUE)
+#' fill_down(NM, reverse = TRUE)
+#' @export
 
 fill_down <- function(x, empty_string = FALSE, reverse = FALSE){
   #' @param x An atomic vector

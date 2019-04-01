@@ -9,8 +9,11 @@ round_per(x, digits = 1)
 \arguments{
 \item{x}{A numeric vector}
 
-\item{digist}{The number of digits to round to}
+\item{digits}{The number of digits to round to}
 }
 \description{
 Rounds 100*x, formats to desired number of digits
+}
+\examples{
+round_per(c(0.5, 0.6789, 1.0241))
 }

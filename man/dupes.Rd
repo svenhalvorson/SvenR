@@ -15,6 +15,10 @@ A logical object of the same dimensions as \code{x}
 \description{
 Two-way Duplicates
 }
+\examples{
+x = c(1:4, 1, 2, NA)
+dupes(x)
+}
 \author{
 Sven Halvorson
 }

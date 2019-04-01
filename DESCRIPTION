@@ -3,9 +3,9 @@ Type: Package
 Title: Tools for exploration
 Version: 0.1.0
 Author: Sven Halvorson
-Maintainer: svenedmail@gmail.com
-Description: It's a collection of loosely related functions that I use for data cleaning and experiments
+Description: A collection of loosely related functions that I use for data cleaning and experiments
 License: None
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
+Imports: tidyverse (>= 1.2.1)
