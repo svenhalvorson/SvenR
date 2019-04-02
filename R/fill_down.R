@@ -1,5 +1,7 @@
 #' Fill Down
 #' @description Fill missing value with most recent non-missing value
+#' @param x An atomic vector
+#' @param empty_string Should empty strings be treated as NA?
 #' @author Sven Halvorson
 #' @examples
 #' NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
@@ -9,9 +11,6 @@
 #' @export
 
 fill_down <- function(x, empty_string = FALSE, reverse = FALSE){
-  #' @param x An atomic vector
-  #' @param empty_string Should empty strings be treated as NA?
-
 
   if(!is.atomic(x) | !is.vector(x)){
     stop("x must be an atomic vector")

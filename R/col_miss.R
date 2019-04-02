@@ -1,5 +1,7 @@
 #' Column Missing Counts
 #' @description Count missing values by column
+#' @param df A data frame
+#' @param empty_string Should only white space values be treated as NA?
 #' @note Likely to be used interactively
 #' @author Sven Halvorson
 #' @examples
@@ -13,8 +15,7 @@
 #' col_miss(df, empty_string = TRUE)
 #' @export
 col_miss = function(df, empty_string = FALSE){
-  #' @param df A data frame
-  #' @param empty_string Should only white space values be treated as NA?
+
 
   # Always use protection:
   if(!is.data.frame(df) |

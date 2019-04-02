@@ -1,5 +1,6 @@
 #' Sort Columns
 #' @description Useful for finding colum names
+#' @param df a data frame
 #' @note For interactive use
 #' @author Sven Halvorson
 #' @examples
@@ -7,6 +8,5 @@
 #' @export
 
 scols = function(df){
-  #' @param df a data frame
   sort(colnames(df))
 }

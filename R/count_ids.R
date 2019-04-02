@@ -1,6 +1,8 @@
 #' Count IDs
 #' @description Computes \code{n_distinct} on specified columns and gives row count.
 #' @note Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied.
+#' @param df A data frame
+#' @param ... Unquoted column names in \code{df}
 #' @return \code{df}, intended for side effect use.
 #' @author Sven Halvorson
 #' @examples
@@ -13,8 +15,7 @@
 
 count_ids = function(df, ...){
 
-  #' @param df A data frame
-  #' @param ... Unquoted column names in \code{df}
+
 
   library("dplyr")
   ids = quos(...)

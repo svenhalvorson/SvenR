@@ -1,5 +1,6 @@
 #' Pad MRNs
 #' @description adds leading zeroes to numeric vector
+#' @param x atomic vector
 #' @author Sven Halvorson
 #' @examples
 #' mrns = c(11111111, 222222, 33333)
@@ -7,8 +8,6 @@
 #' @export
 pad_mrn = function(x){
 
-  #' @param x atomic vector
-  library("stringr")
   # Brief little check just to catch myself
   if(any(!is.atomic(x),
          length(x) == 0,

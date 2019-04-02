@@ -1,5 +1,10 @@
 #' Find Columns
 #' @description  Find columns in a data frame by regular expression
+#' @param df A data frame
+#' @param ... Regular expressions, quoted or not
+#' @param value Should the column names or positions be returned?
+#' @param ignore.case Should case be ignored in regular expression matching?
+#' @note This is mostly for interactive use
 #' @author Sven Halvorson
 #' @examples
 #' find_cols(mtcars, ar, pg)
@@ -7,12 +12,6 @@
 #' @export
 
 find_cols = function(df, ..., value = TRUE, ignore.case = TRUE){
-
-  #' @param df A data frame
-  #' @param ... Regular expressions, quoted or not
-  #' @param value Should the column names or positions be returned?
-  #' @param ignore.case Should case be ignored in regular expression matching?
-  #' @note This is mostly for interactive use
 
   if(!is.data.frame(df)){
     stop('df must be a data.frame')

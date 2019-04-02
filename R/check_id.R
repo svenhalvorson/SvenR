@@ -1,26 +1,28 @@
 
 #' Check IDs
 #' @description Test keys for uniqueness or try to find unique keys
+#' @param df A data frame
+#' @param ... Columns within df. These can be quoted or NSE
+#' @param max_depth The maximum number of columns to look for a unique key among.
+#' @details The intent of this function is twofold. First, it will test if a set
+#' of supplied columns are a unique key. By 'unique key' we mean that each
+#' combination of those variables uniquely specifies a row in df.
+#' Supply columns to \code{...} for this functionality. \cr \cr
+#' The second purpose of check_id is to determine which sets of column(s)
+#' if any, determine a unique key for \code{df}. If any do, they will be listed.
+#' Othewise, the closest key(s) will be listed. The output in this case
+#' is a data frame of statistics on the attempts.
 #' @author Sven Halvorson
 #' @examples
 #' check_id(mtcars)
 #' check_id(mtcars, cyl, mpg)
 #' check_id(mtcars, c('cyl', 'mpg'))
 #' @export
+#' @import tidyverse
+
 
 check_id = function(df, ..., max_depth = 3){
 
-  #' @param df A data frame
-  #' @param ... Columns within df. These can be quoted or NSE
-  #' @param max_depth The maximum number of columns to look for a unique key among.
-  #' @details The intent of this function is twofold. First, it will test if a set
-  #' of supplied columns are a unique key. By 'unique key' we mean that each
-  #' combination of those variables uniquely specifies a row in df.
-  #' Supply columns to \code{...} for this functionality. \cr \cr
-  #' The second purpose of check_id is to determine which sets of column(s)
-  #' if any, determine a unique key for \code{df}. If any do, they will be listed.
-  #' Othewise, the closest key(s) will be listed. The output in this case
-  #' is a data frame of statistics on the attempts.
 
   # Preliminaries -----------------------------------------------------------
 
