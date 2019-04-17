@@ -15,9 +15,6 @@
 
 count_ids = function(df, ...){
 
-
-
-  library("dplyr")
   ids = quos(...)
 
   # if you don't supply ids, do the phds normal three
