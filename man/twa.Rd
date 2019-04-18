@@ -12,7 +12,7 @@ twa(df, value_var, time_var, ..., method = "trapezoid", ref = 0,
 
 \item{value_var}{the value to be avaraged, a column within df}
 
-\item{time_var}{the time variable for weighting. A column within df of class \code{POSIXct}}
+\item{time_var}{the time variable for weighting. Either \code{POSIXct} or numeric.}
 
 \item{...}{grouping variables within df}
 
@@ -34,15 +34,18 @@ value reference value. By default, they are computed as above 0.
 \details{
 If multiple rows have the same grouping variables and time, the median value will be selected.
 Rows with missing. If only one value within a grouping level is supplied, that value will be returned.d
-\code{twa} also computes the total minutes elapsed, the largest and smallest gap between consecutive points,
-and the number of values received, used, and omitted.
+\code{twa} also computes the total time elapsed, the largest and smallest gap between consecutive points,
+and the number of values received, used, and omitted. When \code{time_var} is \code{POSIXct}, \code{twa}
+will default to minutes.
 }
 \examples{
 start_date = ymd_hms('2019-01-01 00:00:00')
 time_dat = tibble(id = c(1, 1, 1, 1, 2, 2),
                   val = c(4, 6, 8, 6, 1, NA),
-                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date)
+                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
+                  t2 = 1:6)
 twa(df = time_dat, value_var = val, time_var = t, id)
+twa(df = time_dat, value_var = val, time_var = t2, method = 'left', ref = 7, ref_dir = 'below')
 }
 \author{
 Sven Halvorson

@@ -6,11 +6,12 @@
 
 #' @details If multiple rows have the same grouping variables and time, the median value will be selected.
 #' Rows with missing. If only one value within a grouping level is supplied, that value will be returned.d
-#' \code{twa} also computes the total minutes elapsed, the largest and smallest gap between consecutive points,
-#' and the number of values received, used, and omitted.
+#' \code{twa} also computes the total time elapsed, the largest and smallest gap between consecutive points,
+#' and the number of values received, used, and omitted. When \code{time_var} is \code{POSIXct}, \code{twa}
+#' will default to minutes.
 #' @param df a data frame, assumed to be in a 'long form' with time values in a single column
 #' @param value_var the value to be avaraged, a column within df
-#' @param time_var the time variable for weighting. A column within df of class \code{POSIXct}
+#' @param time_var the time variable for weighting. Either \code{POSIXct} or numeric.
 #' @param ... grouping variables within df
 #' @param method method to compute TWA, one of \code{c('trapezoid', 'left', 'right')}
 #' @param ref a value to compute the TWA relative to
@@ -20,8 +21,10 @@
 #' start_date = ymd_hms('2019-01-01 00:00:00')
 #' time_dat = tibble(id = c(1, 1, 1, 1, 2, 2),
 #'                   val = c(4, 6, 8, 6, 1, NA),
-#'                   t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date)
+#'                   t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
+#'                   t2 = 1:6)
 #' twa(df = time_dat, value_var = val, time_var = t, id)
+#' twa(df = time_dat, value_var = val, time_var = t2, method = 'left', ref = 7, ref_dir = 'below')
 #' @author Sven Halvorson
 #' @export
 twa = function(df, value_var, time_var, ...,
@@ -37,10 +40,16 @@ twa = function(df, value_var, time_var, ...,
     map_chr(quo_name)
 
   # Check whether we have the right datatypes
-  # if(!is.data.frame(df)){
-  #   stop('df must be a data frame')
-  # }
-  # if(!quo_name(time_var) %in% colnames())
+  if(!is.data.frame(df)){
+    stop('df must be a data frame')
+  }
+  if(any(!c(value_var_s, time_var_s, group_vars_s) %in% colnames(df))){
+    stop('supplied columns not found in df')
+  }
+  if(!is.numeric(df[[value_var_s]]) | !is.numeric(df[[time_var_s]])){
+    stop('value_var & time_var must be numeric')
+  }
+
 
 
   # clean time points -------------------------------------------------------
@@ -89,12 +98,16 @@ twa = function(df, value_var, time_var, ...,
   # a reference value
   multiplier = ifelse(ref_dir == 'above', 1, -1)
   lead_lag = ifelse(method == 'right', lag, lead)
+  difference_fun = ifelse(is.POSIXct(df[[time_var_s]]),
+                          function(x, y){difftime(x, y, units = 'mins')},
+                          function(x, y){x - y})
+
   # Now create the times and values:
   df = df %>%
     mutate(method = method,
            dir = ref_dir,
            time_shift = lead_lag(!!time_var),
-           time_diff = difftime(!!time_var, time_shift, units = 'mins'),
+           time_diff = difference_fun(!!time_var, time_shift),
            time_diff = abs(as.numeric(time_diff)),
            lead_val = lead(!!value_var),
            new_val = case_when(method == 'trapezoid' ~
@@ -105,19 +118,19 @@ twa = function(df, value_var, time_var, ...,
            weighted_val = pmax(new_val*time_diff, 0)) %>%
     # now summarize the times and values. We'll use a maximum
     # in the case that there is only one reading
-    summarize(total_min = sum(time_diff, na.rm = TRUE),
+    summarize(total_time = sum(time_diff, na.rm = TRUE),
               total_weight = sum(weighted_val, na.rm = TRUE),
               max_measure = max(!!value_var),
               max_gap = max(time_diff, na.rm = TRUE),
               max_gap = replace(max_gap, is.infinite(max_gap), 0),
               min_gap = min(time_diff, na.rm = TRUE),
               min_gap = replace(min_gap, is.infinite(min_gap), 0)) %>%
-    mutate(twa = total_weight/total_min,
-           twa = case_when(total_min > 0 ~ twa,
+    mutate(twa = total_weight/total_time,
+           twa = case_when(total_time > 0 ~ twa,
                            TRUE ~ max_measure)) %>%
     # nifty trick to change the select based on whether group_vars were supplied
-    when(length(group_vars) == 0 ~ select(., twa, total_min, max_gap, min_gap),
-         ~ select(., !!!group_vars, twa, total_min, max_gap, min_gap))
+    when(length(group_vars) == 0 ~ select(., twa, total_time, max_gap, min_gap),
+         ~ select(., !!!group_vars, twa, total_time, max_gap, min_gap))
 
   # attach other measures and export ----------------------------------------
 
