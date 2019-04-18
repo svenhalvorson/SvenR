@@ -46,8 +46,17 @@ twa = function(df, value_var, time_var, ...,
   if(any(!c(value_var_s, time_var_s, group_vars_s) %in% colnames(df))){
     stop('supplied columns not found in df')
   }
-  if(!is.numeric(df[[value_var_s]]) | !is.numeric(df[[time_var_s]])){
-    stop('value_var & time_var must be numeric')
+  if(!(is.numeric(df[[time_var_s]]) | is.POSIXct(df[[time_var_s]]))){
+    stop('time_var must be numeric or POSIXct')
+  }
+  if(!is.numeric(df[[value_var_s]])){
+    stop('value_var must be numeric')
+  }
+  if(length(ref != 1) | !is.numeric(ref)){
+    stop('ref incorrectly specified')
+  }
+  if(length(ref_dir) != 1 | !ref_dir %in% c('above', 'below', 'about')){
+    stop('ref_dir incorrectly specified')
   }
 
 
@@ -112,9 +121,8 @@ twa = function(df, value_var, time_var, ...,
            lead_val = lead(!!value_var),
            new_val = case_when(method == 'trapezoid' ~
                                  multiplier*(0.5*(lead_val + !!value_var) - ref),
-                               dir == 'below' ~ ref - !!value_var,
-                               dir == 'above' ~ !!value_var -ref,
-                               dir == 'about' ~ abs(!!value_var - ref)),
+                               dir == 'about' ~ abs(!!value_var - ref),
+                               TRUE ~ multiplier*(!!value_var - ref)),
            weighted_val = pmax(new_val*time_diff, 0)) %>%
     # now summarize the times and values. We'll use a maximum
     # in the case that there is only one reading
