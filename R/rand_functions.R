@@ -142,13 +142,12 @@ headlines <- function(){
   message("Here are some of today's headlines:")
   html <- read_html("https://news.google.com/news/?ned=us&gl=US&hl=en")
   headlines = html %>%
-    html_nodes(".VDXfz") %>%
+    html_nodes('.DY5T1d') %>%
     html_text()
 
-  for(i in 1:10){
+  for(i in (1:10)*5){
     cat(paste("\t",headlines[i],"\n\n"))
     Sys.sleep(1.3)
   }
-  headlines
 
 }
