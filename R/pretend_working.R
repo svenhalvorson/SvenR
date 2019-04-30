@@ -13,11 +13,9 @@ pretend_working <- function(minutes = 5){
   # So we want some other functions here like a loading bar
 
   while(difftime(time1 = Sys.time(), time2 = start_time, units = "mins") < minutes){
-    func <- sample(x = c("bar", "flashy", "wiki", "stack",
-                         #"headlines",
-                         "message"), size = 1, prob = c(0.2, 0.2, 0.2, 0.1,
-                                                        #0.1,
-                                                        0.2))
+    func <- sample(x = c("bar", "flashy", "wiki",
+                         "stack", "headlines",
+                         "message"), size = 1, prob = c(0.2, 0.2, 0.2, 0.1, 0.1, 0.2))
 
     switch(EXPR = func,
            bar = progress_bar(),
