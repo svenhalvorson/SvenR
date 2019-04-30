@@ -52,7 +52,7 @@ twa = function(df, value_var, time_var, ...,
   if(!is.numeric(df[[value_var_s]])){
     stop('value_var must be numeric')
   }
-  if(length(ref != 1) | !is.numeric(ref)){
+  if(length(ref) != 1 | !is.numeric(ref)){
     stop('ref incorrectly specified')
   }
   if(length(ref_dir) != 1 | !ref_dir %in% c('above', 'below', 'about')){
