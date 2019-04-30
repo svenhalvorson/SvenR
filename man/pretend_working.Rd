@@ -13,6 +13,9 @@ pretend_working(minutes = 5)
 Creates poorly veiled wizbangs that might make it look
 like someting important is happening on your computer
 }
+\examples{
+pretend_working(2)
+}
 \author{
 Sven Halvorson
 }

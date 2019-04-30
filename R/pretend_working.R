@@ -4,7 +4,7 @@
 #' @import rvest
 #' @param minutes run time
 #' @author Sven Halvorson
-#' @example pretend_working(2)
+#' @examples pretend_working(2)
 
 pretend_working <- function(minutes = 5){
 
