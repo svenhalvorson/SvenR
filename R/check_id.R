@@ -89,7 +89,7 @@ check_id = function(df, ..., max_depth = 3){
 
   # store whether we've found a unique combo and start looping
   unique_found = 0
-  for(i in 1:max_depth){
+  for(i in 1:min(max_depth, ncol(df))){
 
     combos = col_combos(i)
 
