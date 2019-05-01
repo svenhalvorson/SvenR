@@ -145,7 +145,7 @@ headlines <- function(){
     html_nodes('.DY5T1d') %>%
     html_text()
 
-  for(i in (1:10)*5){
+  for(i in (0:9)*5+1){
     cat(paste("\t",headlines[i],"\n\n"))
     Sys.sleep(1.3)
   }
