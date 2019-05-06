@@ -1,8 +1,8 @@
 #' Time Weighted Averages
 #' @description This function computes time weighted averages of \code{value_var} across zero or more groups.
-#' Averages can be computed by trapezoids or left/right endpoints. Time weighted averages are
-#' computed relative to a reference value. They can be computed above, below, or about the supplied
-#' value reference value. By default, they are computed as above 0.
+#' Averages can be computed by trapezoids or left/right endpoints. Time weighted averages can be computed
+#' with raw values or relative to a reference. Calculations can be above below, or about the supplied
+#' reference value. By default, they are computed as raw.
 
 #' @details If multiple rows have the same grouping variables and time, the median value will be selected.
 #' Rows with missing. If only one value within a grouping level is supplied, that value will be returned.d
@@ -28,22 +28,22 @@
 #' @author Sven Halvorson
 #' @export
 twa = function(df, value_var, time_var, ...,
-               method = 'trapezoid', ref = 0, ref_dir = 'above'){
+               method = 'trapezoid', ref = 0, ref_dir = 'raw'){
 
   # capture the potential NSE
   value_var = enquo(value_var)
   value_var_s = quo_name(value_var)
   time_var = enquo(time_var)
   time_var_s = quo_name(time_var)
-  group_vars = enquos(...)
-  group_vars_s = group_vars %>%
+  grouping_vars = enquos(...)
+  grouping_vars_s = grouping_vars %>%
     map_chr(quo_name)
 
   # Check whether we have the right datatypes
   if(!is.data.frame(df)){
     stop('df must be a data frame')
   }
-  if(any(!c(value_var_s, time_var_s, group_vars_s) %in% colnames(df))){
+  if(any(!c(value_var_s, time_var_s, grouping_vars_s) %in% colnames(df))){
     stop('supplied columns not found in df')
   }
   if(!(is.numeric(df[[time_var_s]]) | is.POSIXct(df[[time_var_s]]))){
@@ -55,8 +55,11 @@ twa = function(df, value_var, time_var, ...,
   if(length(ref) != 1 | !is.numeric(ref)){
     stop('ref incorrectly specified')
   }
-  if(length(ref_dir) != 1 | !ref_dir %in% c('above', 'below', 'about')){
+  if(length(ref_dir) != 1 | !ref_dir %in% c('raw', 'above', 'below', 'about')){
     stop('ref_dir incorrectly specified')
+  }
+  if(ref_dir == 'raw' & ref != 0){
+    stop('ref must be zero if ref_dir == "raw"')
   }
 
 
@@ -67,10 +70,10 @@ twa = function(df, value_var, time_var, ...,
   # 1) We're sorted & grouped properly
   df = df %>%
     arrange(!!time_var)
-  if(length(group_vars) != 0){
+  if(length(grouping_vars) != 0){
     df = df %>%
-      group_by(!!!group_vars) %>%
-      arrange(!!!group_vars)
+      group_by(!!!grouping_vars) %>%
+      arrange(!!!grouping_vars)
   }
 
   # 2) If there are missing outputs or times, record and then delete them.
@@ -91,10 +94,10 @@ twa = function(df, value_var, time_var, ...,
     ungroup
 
   # regroup if needed to count actual data used:
-  if(length(group_vars) != 0){
+  if(length(grouping_vars) != 0){
     df = df %>%
-      group_by(!!!group_vars) %>%
-      arrange(!!!group_vars)
+      group_by(!!!grouping_vars) %>%
+      arrange(!!!grouping_vars)
   }
   used_readings = df %>%
     summarize(n_used = n())
@@ -105,12 +108,12 @@ twa = function(df, value_var, time_var, ...,
   # Now we'll go ahead and compute the TWA. We'll need to determine
   # which method of computing it we'll use and whether we're using
   # a reference value
-  multiplier = ifelse(ref_dir == 'above', 1, -1)
+  multiplier = ifelse(ref_dir == 'below', -1, 1)
   lead_lag = ifelse(method == 'right', lag, lead)
   difference_fun = ifelse(is.POSIXct(df[[time_var_s]]),
                           function(x, y){difftime(x, y, units = 'mins')},
                           function(x, y){x - y})
-
+  browser()
   # Now create the times and values:
   df = df %>%
     mutate(method = method,
@@ -123,7 +126,9 @@ twa = function(df, value_var, time_var, ...,
                                  multiplier*(0.5*(lead_val + !!value_var) - ref),
                                dir == 'about' ~ abs(!!value_var - ref),
                                TRUE ~ multiplier*(!!value_var - ref)),
-           weighted_val = pmax(new_val*time_diff, 0)) %>%
+           weighted_val = new_val*time_diff,
+           weighted_val = case_when(dir == 'raw' ~ weighted_val,
+                                    TRUE ~ pmax(weighted_val, 0))) %>%
     # now summarize the times and values. We'll use a maximum
     # in the case that there is only one reading
     summarize(total_time = sum(time_diff, na.rm = TRUE),
@@ -136,14 +141,14 @@ twa = function(df, value_var, time_var, ...,
     mutate(twa = total_weight/total_time,
            twa = case_when(total_time > 0 ~ twa,
                            TRUE ~ max_measure)) %>%
-    # nifty trick to change the select based on whether group_vars were supplied
-    when(length(group_vars) == 0 ~ select(., twa, total_time, max_gap, min_gap),
-         ~ select(., !!!group_vars, twa, total_time, max_gap, min_gap))
+    # nifty trick to change the select based on whether grouping_vars were supplied
+    when(length(grouping_vars) == 0 ~ select(., twa, total_time, max_gap, min_gap),
+         ~ select(., !!!grouping_vars, twa, total_time, max_gap, min_gap))
 
   # attach other measures and export ----------------------------------------
 
   # if we have no grouping variables:
-  bind_fun = ifelse(length(group_vars) == 0, bind_cols, function(x,y){suppressMessages(full_join(x,y))})
+  bind_fun = ifelse(length(grouping_vars) == 0, bind_cols, function(x,y){suppressMessages(full_join(x,y))})
 
   # join summaries and return
   df  %>%

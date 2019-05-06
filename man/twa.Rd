@@ -5,7 +5,7 @@
 \title{Time Weighted Averages}
 \usage{
 twa(df, value_var, time_var, ..., method = "trapezoid", ref = 0,
-  ref_dir = "above")
+  ref_dir = "raw")
 }
 \arguments{
 \item{df}{a data frame, assumed to be in a 'long form' with time values in a single column}
@@ -27,9 +27,9 @@ a data frame containing any grouping variables, the computed twa, and some other
 }
 \description{
 This function computes time weighted averages of \code{value_var} across zero or more groups.
-Averages can be computed by trapezoids or left/right endpoints. Time weighted averages are
-computed relative to a reference value. They can be computed above, below, or about the supplied
-value reference value. By default, they are computed as above 0.
+Averages can be computed by trapezoids or left/right endpoints. Time weighted averages can be computed
+with raw values or relative to a reference. Calculations can be above below, or about the supplied
+reference value. By default, they are computed as raw.
 }
 \details{
 If multiple rows have the same grouping variables and time, the median value will be selected.
