@@ -113,7 +113,7 @@ twa = function(df, value_var, time_var, ...,
   difference_fun = ifelse(is.POSIXct(df[[time_var_s]]),
                           function(x, y){difftime(x, y, units = 'mins')},
                           function(x, y){x - y})
-  browser()
+
   # Now create the times and values:
   df = df %>%
     mutate(method = method,
