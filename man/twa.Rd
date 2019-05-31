@@ -20,7 +20,7 @@ twa(df, value_var, time_var, ..., method = "trapezoid", ref = 0,
 
 \item{ref}{a value to compute the TWA relative to}
 
-\item{ref_dir}{the direction to compute the average relative to ref, one of \code{c('raw', 'above', 'below', 'about')}}
+\item{ref_dir}{the direction to compute the average relative to ref, one of \code{c('above', 'below', 'about')}}
 }
 \value{
 a data frame containing any grouping variables, the computed twa, and some other summary statistics
