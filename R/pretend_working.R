@@ -1,7 +1,6 @@
 #' Pretend to Work
 #' @description Creates poorly veiled wizbangs that might make it look
 #'like someting important is happening on your computer
-#' @import rvest
 #' @param minutes run time
 #' @author Sven Halvorson
 #' @examples pretend_working(2)

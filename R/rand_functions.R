@@ -8,16 +8,16 @@ rand_wiki <- function(){
     Sys.sleep(0.3)
     cat(".")
   }
-  html <- read_html("http://en.wikipedia.org/wiki/Special:Random")
+  html <- rvest::read_html("http://en.wikipedia.org/wiki/Special:Random")
   title <- html %>%
-    html_nodes("#firstHeading") %>%
-    html_text()
+    rvest:: html_nodes("#firstHeading") %>%
+    rvest::html_text()
   cat("\n")
   message("Article: ", title)
   Sys.sleep(4)
   body <- html %>%
-    html_nodes("p") %>%
-    html_text()
+    rvest:: html_nodes("p") %>%
+    rvest::html_text()
   # Now if we print the text of the body, it will come out in huge chunks so let's slow it down
   # and truncate it so less total text is printed
   body = body[body != ""]
@@ -45,10 +45,10 @@ rand_stack <- function(){
                size = 1)
 
   cat(paste("Here are the most recent", tag,  "questions from stackoverflow.com\n\n"))
-  html <- read_html(paste0("https://stackoverflow.com/questions/tagged/",tag))
+  html <- rvest:: read_html(paste0("https://stackoverflow.com/questions/tagged/",tag))
   questions = html %>%
-    html_nodes(".question-hyperlink") %>%
-    html_text()
+    rvest::html_nodes(".question-hyperlink") %>%
+    rvest::html_text()
   for(i in 1:10){
     cat(paste("\t",questions[i],"\n\n"))
     Sys.sleep(1.2)
@@ -135,15 +135,13 @@ buncha_messages <- function(){
   }
 }
 
-# dangit, google news changed their layout so this doesn't work anymore
-
-
+# Google headlines... note that it depends on their layout not changing much
 headlines <- function(){
   message("Here are some of today's headlines:")
-  html <- read_html("https://news.google.com/news/?ned=us&gl=US&hl=en")
+  html <- rvest::read_html("https://news.google.com/news/?ned=us&gl=US&hl=en")
   headlines = html %>%
-    html_nodes('.DY5T1d') %>%
-    html_text()
+    rvest::html_nodes('.DY5T1d') %>%
+    rvest::html_text()
 
   for(i in (0:9)*5+1){
     cat(paste("\t",headlines[i],"\n\n"))
