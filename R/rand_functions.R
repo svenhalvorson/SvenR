@@ -8,7 +8,7 @@ rand_wiki <- function(){
     Sys.sleep(0.3)
     cat(".")
   }
-  html <- rvest::read_html("http://en.wikipedia.org/wiki/Special:Random")
+  html <- xml2::read_html("http://en.wikipedia.org/wiki/Special:Random")
   title <- html %>%
     rvest:: html_nodes("#firstHeading") %>%
     rvest::html_text()
@@ -45,7 +45,7 @@ rand_stack <- function(){
                size = 1)
 
   cat(paste("Here are the most recent", tag,  "questions from stackoverflow.com\n\n"))
-  html <- rvest:: read_html(paste0("https://stackoverflow.com/questions/tagged/",tag))
+  html <- xml2::read_html(paste0("https://stackoverflow.com/questions/tagged/",tag))
   questions = html %>%
     rvest::html_nodes(".question-hyperlink") %>%
     rvest::html_text()
@@ -138,7 +138,7 @@ buncha_messages <- function(){
 # Google headlines... note that it depends on their layout not changing much
 headlines <- function(){
   message("Here are some of today's headlines:")
-  html <- rvest::read_html("https://news.google.com/news/?ned=us&gl=US&hl=en")
+  html <- xml2::read_html("https://news.google.com/news/?ned=us&gl=US&hl=en")
   headlines = html %>%
     rvest::html_nodes('.DY5T1d') %>%
     rvest::html_text()

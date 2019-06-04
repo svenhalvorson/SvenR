@@ -5,6 +5,8 @@
 #' @author Sven Halvorson
 #' @examples pretend_working(2)
 #' @export
+#' @importFrom rvest html_nodes html_text
+#' @importFrom xml2 read_html
 
 pretend_working <- function(minutes = 5){
 
