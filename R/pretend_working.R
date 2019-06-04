@@ -4,6 +4,7 @@
 #' @param minutes run time
 #' @author Sven Halvorson
 #' @examples pretend_working(2)
+#' @export
 
 pretend_working <- function(minutes = 5){
 
