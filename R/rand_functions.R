@@ -59,10 +59,23 @@ rand_stack <- function(){
 # random progress bar
 progress_bar <- function(){
   total <- 20
-  action = sample(x = c("Calibrating", "Examining", "Loading", "Deparsing", "Extracting", "Disturbing", "Intimidating", "Decimating", "Dispatching", "Systemtizing"), size = 1)
-  adjective = sample(x = c("syrupy", "raw", "fragmented", "non-standard", "mythical", "lewd", "practical", "orthogonal", "ficticious", "large"), size = 1)
-  noun = sample(x = c("data", "models", "progress monitors", "cake", "octopuses", "strings", "relationships", "bourgeoisie", "parameters", "pages", "subsets"), size = 1)
-  notice = sample(x = c(". This may take some time...", "", ". One moment please...", ". Gimmie a minute...", ""), size = 1)
+  action = sample(x = c("Calibrating", "Examining", "Loading", "Deparsing",
+                        "Extracting", "Disturbing", "Intimidating", "Decimating",
+                        "Dispatching", "Systemtizing", 'Mirroring',
+                        'Retrieving', 'Validating', 'De-fragmenting',
+                        'Guessing', 'Disentangling'), size = 1)
+  adjective = sample(x = c("syrupy", "raw", "fragmented", "non-standard",
+                           "mythical", "lewd", "practical", "orthogonal",
+                           "ficticious", "large", 'mysterious', 'unobserved',
+                           'auto-correlated', 'impartial', 'fallacious',
+                           'compromised', 'ill-equipped', 'distinct'), size = 1)
+  noun = sample(x = c("data", "models", "progress monitors", "cake",
+                      "octopuses", "strings", "relationships", "bourgeoisie",
+                      "parameters", "pages", "subsets", 'collections',
+                      'databases', 'tables', 'queries', 'lesions',
+                      'uneducated masses', 'algorithms', 'communcations'), size = 1)
+  notice = sample(x = c(". This may take some time...", ". One moment please...", ". Gimmie a minute...", ""),
+                  size = 1, prob = c(.05, .05, .05, .85))
   print(paste0(action, " ", adjective, " ", noun, notice))
   # create progress bar
   pb <- txtProgressBar(min = 0, max = total, style = 3)
@@ -85,13 +98,15 @@ flashy_bar <- function(){
 
   verbs = c("Truncating", "Proselytizing", "Disaggregating", "Finalzing", "Decoupling",
             "Casting", "Repairing", "Recyling", "Verifying", "Synthesizing", "Strong-arming",
-            "Transposing", "P-hacking")
+            "Transposing", "P-hacking", 'Re-imagining', 'Collating', 'Igniting')
   adjectives = c("active", "normal", "uneven", "specious", "stranded", "overrated", "hyper",
                  "dark", "new", "special", "circular", "crusty", "heterogeneous", "misguided",
-                 "inverted")
+                 "inverted", 'skewed', 'log transformed', 'overfitted', 'naive', 'disguised', 'dense',
+                 'enhanced', 'redistributed', 'segmented', 'dorsal', 'simple')
   nouns = c("water foul", "data frames", "maps", "coefficients", "metrics", "indicators", "deep dives",
             "coastlines", "New Mexicans", "diagrams", "priorities", "animations", "notifications",
-            "statistics", "f-values", "correlations")
+            "statistics", "f-values", "correlations", 'manuscripts', 'procedures', 'samples', 'libraries',
+            'neural networks', 'clusters', 'pathways')
 
   times = sample(1:4, size = 1)
   for(i in 1:times){
@@ -122,8 +137,13 @@ buncha_messages <- function(){
   let4 = sample(letters, size = num_messages, replace = TRUE)
   names = paste0(nums1,let1, let2, let3, nums2, let4)
 
-  object = sample(x = c("File", "Graph", "Iteration", "Matrix", "Worksheet", "Cell"), size = 1)
-  verb = sample(x = c("imported", "deregulated", "parsed", "processed", "transformed", "interpolated", "refreshed"), size = 1)
+  object = sample(x = c("File", "Graph", "Iteration", "Matrix",
+                        "Worksheet", "Cell", 'Model', 'Documentation',
+                        'System', 'Instance', 'Simulation'), size = 1)
+  verb = sample(x = c("imported", "deregulated", "parsed", "processed",
+                      "transformed", "interpolated", "refreshed",
+                      'decoupled', 'erased', 'seized',
+                      'distributed', 'mechanized', 'attributed'), size = 1)
   for(i in 1:num_messages){
     Sys.sleep(0.7)
     if(runif(n = 1) <0.03){

@@ -1,0 +1,142 @@
+---
+output: github_document
+---
+
+# IN PROGRESS (2019-06-05)!
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  fig.pos = 'c'
+)
+```
+
+```{r setup, include=FALSE}
+.libPaths("C:/Users/HALVORS/Documents/rlibs")
+library('lubridate')
+library('tidyverse')
+library('kableExtra')
+library('SvenR')
+```
+
+## SvenR
+
+I like to pretend I'm a software developer so I created this little package. It's probably
+completely unneccessary as I frequently find better versions of the functions I write later.
+Creating a library is fun though, so maybe you will enjoy it too. I'll show some examples of
+what the code can do and what my ideas were behind it.
+
+### Installation
+
+Get it from [github](https://www.github.com/svenhalvorson/svenr):
+
+```{r example, message = FALSE, eval = FALSE, echo = TRUE}
+devtools::install_github('svenhalvorson/svenr')
+library('SvenR')
+```
+
+### Time Weighted Averages
+
+Time weighted averages are a way of summarizing a numberical variable over
+many time points. Often it's useful when the measurements occur at irregular
+intervals. Basically we're multiplying the values by how long they occur for
+and then dividing by the total time. It's very similar to taking a Riemann sum.
+
+Here's some example data:
+
+```{r twa_data, echo = FALSE, fig.align = 'center'}
+
+start_date = ymd_hms('2019-01-01 00:00:00')
+twa_ex = tibble(id = c(1, 1, 1, 1, 2, 2),
+                  val = c(4, 6, 8, 6, 1, NA),
+                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
+                  t2 = 1:6)
+kable(twa_ex, align = 'c', format = 'markdown' )
+
+```
+
+The idea here is that have an **id** variable, a **val**ue variable,
+and two **t**ime variables. We want to summarize the value over time.
+There are three methods of counting the points that are supported:
+trapezoids and left/right endpoints.
+
+Visually, the first id's values look like this:
+
+```{r twa_types, echo = FALSE, fig.align='center', fig.align='center', fig.width=6, fig.height=3}
+
+id1 = twa_ex %>% 
+  filter(id == 1)
+id1 = id1 %>% 
+  bind_rows(id1) %>% 
+  bind_rows(id1) %>% 
+  mutate(group = case_when((row_number()-1) %/% 4 == 0 ~ 'Trapezoid',
+                           (row_number()-1) %/% 4 == 1 ~ 'Left',
+                           (row_number()-1) %/% 4 == 2 ~ 'Right'))
+
+sticks = tribble(~t, ~val, ~group,
+                 id1$t[1], 0, 'Trapezoid',
+                 id1$t[1], 4, 'Trapezoid',
+                 id1$t[2], 6, 'Trapezoid',
+                 id1$t[3], 8, 'Trapezoid',
+                 id1$t[4], 6, 'Trapezoid',
+                 id1$t[4], 0, 'Trapezoid',
+                 id1$t[1], 0, 'Left',
+                 id1$t[1], 4, 'Left',
+                 id1$t[2], 4, 'Left',
+                 id1$t[2], 6, 'Left',
+                 id1$t[3], 6, 'Left',
+                 id1$t[3], 8, 'Left',
+                 id1$t[4], 8, 'Left',
+                 id1$t[4], 0, 'Left',
+                 id1$t[1], 0, 'Right',
+                 id1$t[1], 6, 'Right',
+                 id1$t[2], 6, 'Right',
+                 id1$t[2], 8, 'Right',
+                 id1$t[3], 8, 'Right',
+                 id1$t[3], 6, 'Right',
+                 id1$t[4], 6, 'Right',
+                 id1$t[4], 0, 'Right')
+
+ggplot() +
+  geom_polygon(data = sticks, mapping = aes(x = t, y = val), fill = 'goldenrod1') +
+  geom_point(data = id1, mapping = aes(x = t, y = val), size = 2) +
+  #theme_minimal() +
+  scale_y_continuous(limits = c(0, 10), breaks = 0:5*2) + 
+  facet_grid(.~group) +
+  theme(axis.text.x = element_text(angle = 90))
+
+```
+
+The time weighted average is the area in yellow divided by the total time (45 min).
+The methods will not compute very different totals if the number of data points is large
+but they can look different in a small data set like this.
+
+The time weighted average using left endpoins is this:
+
+<!-- $$\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89$$ -->
+
+Using the function:
+
+```{r twa_execute}
+
+twa(df = twa_ex, value_var = val, time_var = t, id, method = 'left')
+
+```
+
+You must supply the data frame to use, identify the time and value variables, 
+list any id variables, and the method. The function computes the time weighted
+average across each combination of the ids, it tells you the total time used, 
+the largest/smallest intervals (gap), the number of measures
+received, the number utilized, and the number missing.
+
+Some notes:
+
+* Records with missing values or times are removed
+* If multiple records occur at the same time, the median is used
+* If only one record is given for a particular combination of ids, it is returned
+* Nonstandard evaluation is used for all arguments
