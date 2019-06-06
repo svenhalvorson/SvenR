@@ -1,5 +1,5 @@
 
-IN PROGRESS (2019-06-05)!
+EXPLAINER IN PROGRESS (2019-06-05)!
 =========================
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
