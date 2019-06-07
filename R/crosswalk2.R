@@ -1,5 +1,6 @@
 # figuring this out still
 
+
 library(shiny)
 library(miniUI)
 library(rhandsontable)
@@ -58,10 +59,7 @@ crosswalk <- function(df, ..., all_combos = FALSE) {
   ui <- miniPage(
     gadgetTitleBar(paste0("Crosswalk for ", paste(arguments_chr, collapse = ', '), ' in ', df_name)),
     miniContentPanel(
-      # set up the hands on table:
-      df %>%
-        rhandsontable(readOnly = TRUE) %>%
-        hot_col(new_col, readOnly = FALSE)
+
     )
   )
 
@@ -70,8 +68,15 @@ crosswalk <- function(df, ..., all_combos = FALSE) {
 
     # When the Done button is clicked, return a value
     observeEvent(input$done, {
-      returnValue <- dput
+      returnValue <- hot_to_r(input$hot)
       stopApp(returnValue)
+    })
+
+    # Show the handsontable:
+    output$hot <- renderRHandsontable({
+      df %>%
+        rhandsontable(readOnly = TRUE) %>%
+        hot_col(new_col, readOnly = FALSE)
     })
   }
 
