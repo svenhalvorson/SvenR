@@ -12,7 +12,7 @@ IN PROGRESS (2019-06-05)!
 SvenR
 -----
 
-I like to pretend I'm a software developer so I created this little package. It's probably completely unneccessary as I frequently find better versions of the functions I write later. Creating a library is fun though, so maybe you will enjoy it too. I'll show some examples of what the code can do and what my ideas were behind it.
+I like to pretend I'm a software developer so I created this little package. It's probably completely unnecessary as I frequently find better versions of the functions I write later. Creating a library is fun though, so maybe you will enjoy it too. I'll show some examples of what the code can do and what my ideas were behind it.
 
 ### Installation
 
@@ -23,9 +23,11 @@ devtools::install_github('svenhalvorson/svenr')
 library('SvenR')
 ```
 
+If you find any horrendous errors, please let me know at <svenpubmail@gmail.com>
+
 ### Time Weighted Averages
 
-Time weighted averages are a way of summarizing a numberical variable over many time points. Often it's useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
+Time weighted averages are a way of summarizing a numerical variable over many time points. Often it's useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
 
 Here's some example data:
 
@@ -96,7 +98,7 @@ This is sometimes useful if you have a benchmark value you're trying to compare 
 
 ### Checking IDs
 
-I often get data sets where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created two functions (so far) that help with this. These are mostly for interactive use.
+I often get data sets where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions (so far) that help with this. These are mostly for interactive use.
 
 The first is simply a count of unique values for some supplied variables:
 
@@ -152,4 +154,80 @@ check_id(mtcars)
 #>  qsec * am
 #>  qsec * gear
 #>  qsec * carb
+```
+
+The function starts searching by single columns, then tries pairs of columns, up to the number of columns equal to the value supplied to `max_depth` before giving up. If no unique keys were found, the closest combination(s) are listed:
+
+``` r
+
+check_id(mtcars, max_depth = 1)
+#> 
+#> No unique keys found.
+#> Closest key(s):      drat
+#> 
+#> With any of these keys...
+#> Total rows:      21
+#> # non-unique rows:   13
+#> Percent unique rows: 38.1%
+```
+
+Lastly, here's a variation on `duplicated` called `dupes` that I find much more useful for investigating. It flags every observation with at least one other duplicate:
+
+``` r
+
+mtcars %>% 
+  dplyr::mutate(drat_dupe = dupes(drat)) %>% 
+  dplyr::arrange(drat) %>% 
+  dplyr::select(drat, drat_dupe)
+#>    drat drat_dupe
+#> 1  2.76      TRUE
+#> 2  2.76      TRUE
+#> 3  2.93     FALSE
+#> 4  3.00     FALSE
+#> 5  3.07      TRUE
+#> 6  3.07      TRUE
+#> 7  3.07      TRUE
+#> 8  3.08      TRUE
+#> 9  3.08      TRUE
+#> 10 3.15      TRUE
+#> 11 3.15      TRUE
+#> 12 3.21     FALSE
+#> 13 3.23     FALSE
+#> 14 3.54     FALSE
+#> 15 3.62     FALSE
+#> 16 3.73     FALSE
+#> 17 3.90      TRUE
+#> 18 3.90      TRUE
+#> 19 3.92      TRUE
+#> 20 3.92      TRUE
+#> 21 4.22     FALSE
+```
+
+Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated to try and differentiate the observations. I like the STATA function 'duplicates tag' that makes it easier to look at observations with the same IDs.
+
+### Missing data
+
+Missing data causes problems for statistics and programming. I have a couple of functions that I wrote to help identify missing data. First off, I just kept writing `sum(is.na(x))` so here it is:
+
+``` r
+
+sum_na(x = c(NA, NA, 3, 4, NA, NA))
+#> [1] 4
+```
+
+Then I used this to have a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
+
+``` r
+
+tibble(x = c(NA, NA, 3, 4, NA, NA),
+       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
+  col_miss
+#> x y 
+#> 4 1
+
+tibble(x = c(NA, NA, 3, 4, NA, NA),
+       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
+  col_miss(empty_string = TRUE)
+#> x y 
+#> 4 3
 ```
