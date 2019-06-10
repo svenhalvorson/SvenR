@@ -15,7 +15,7 @@
 #' @param ... grouping variables within df
 #' @param method method to compute TWA, one of \code{c('trapezoid', 'left', 'right')}
 #' @param ref a value to compute the TWA relative to
-#' @param ref_dir the direction to compute the average relative to ref, one of \code{c('above', 'below', 'about')}
+#' @param ref_dir the direction to compute the average relative to ref, one of \code{c('raw', 'above', 'below', 'about')}
 #' @return a data frame containing any grouping variables, the computed twa, and some other summary statistics
 #' @examples
 #' start_date = ymd_hms('2019-01-01 00:00:00')
