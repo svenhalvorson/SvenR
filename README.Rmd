@@ -4,6 +4,13 @@ output: github_document
 
 # IN PROGRESS (2019-06-05)!
 
+**Stuff I'm working on right now:**
+
+* Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things
+* Trying to make a shiny gadget that helps you manually create crosswalks
+* Adding explainers in this file
+
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
@@ -11,7 +18,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%",
+ # out.width = "100%",
   fig.pos = 'c'
 )
 ```
@@ -54,8 +61,7 @@ Here's some example data:
 start_date = ymd_hms('2019-01-01 00:00:00')
 twa_ex = tibble(id = c(1, 1, 1, 1, 2, 2),
                   val = c(4, 6, 8, 6, 1, NA),
-                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
-                  t2 = 1:6)
+                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date)
 kable(twa_ex, align = 'c', format = 'markdown' )
 
 ```
@@ -65,9 +71,9 @@ and two **t**ime variables. We want to summarize the value over time.
 There are three methods of counting the points that are supported:
 trapezoids and left/right endpoints.
 
-Visually, the first id's values look like this:
+Visually, the id #1's values look like this:
 
-```{r twa_types, echo = FALSE, fig.align='center', fig.align='center', fig.width=6, fig.height=3}
+```{r twa_types, echo = FALSE, fig.align='center', fig.align='center', fig.width=7, fig.height=3.5}
 
 id1 = twa_ex %>% 
   filter(id == 1)
@@ -116,7 +122,7 @@ The time weighted average is the area in yellow divided by the total time (45 mi
 The methods will not compute very different totals if the number of data points is large
 but they can look different in a small data set like this.
 
-The time weighted average using left endpoins is this:
+The time weighted average using left endpoints is this:
 
 <!-- $$\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89$$ -->
 
@@ -140,3 +146,87 @@ Some notes:
 * If multiple records occur at the same time, the median is used
 * If only one record is given for a particular combination of ids, it is returned
 * Nonstandard evaluation is used for all arguments
+* You can supply a numeric, non-`POSIXct` time vector
+
+I also allowed for computing this summary statistic relative to a reference value.
+The four `ref_dir` modes are as follows:
+
+* **Raw**: no alterations to the data
+* **Above x**: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
+* **Below x**: The converse of above.
+* **About x**: The absolute distance from x is used.
+
+Here's an example of computing the time weighted average above 5:
+```{r twa_execute2}
+
+twa(df = twa_ex, value_var = val, time_var = t, id, ref = 5, ref_dir = 'above', method = 'left')
+
+```
+
+```{r twa_above, echo = FALSE, fig.align='center', fig.align='center', fig.width=4, fig.height=3.5}
+
+
+sticks2 = tribble(~t, ~val,
+                 id1$t[2], 5,
+                 id1$t[2], 6,
+                 id1$t[3], 6,
+                 id1$t[3], 8,
+                 id1$t[4], 8,
+                 id1$t[4], 5)
+ggplot() +
+  geom_polygon(data = sticks2, mapping = aes(x = t, y = val), fill = 'goldenrod1') +
+  geom_point(data = id1, mapping = aes(x = t, y = val), size = 2) +
+  scale_y_continuous(limits = c(0, 10), breaks = 0:5*2) + 
+  theme(axis.text.x = element_text(angle = 90)) +
+  geom_hline(yintercept = 5, linetype = 'dashed')
+
+```
+
+This is sometimes useful if you have a benchmark value you're trying to compare to. Note that
+it uses the entire 45 minutes as the denominator even though the first reading was set to zero because
+it is less than 5.
+
+### Checking IDs
+
+I often get data sets where I'm not sure if a set of variables uniquely identify observations, whether
+any set does, or if the count of specific variables has changed. I created two functions
+(so far) that help with this. These are mostly for interactive use.
+
+The first is simply a count of unique values for some supplied variables:
+
+```{r count_ids_ex}
+
+count_ids(mtcars, cyl, carb)
+
+```
+We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`. It's pipe-able
+so you can see what changes a function will cause:
+
+```{r count_ids_ex2}
+
+mtcars = mtcars %>% 
+  count_ids(cyl, carb) %>% 
+  dplyr::filter(cyl > 4) %>% 
+  count_ids(cyl, carb)
+
+```
+
+I often use this to make sure my merges are doing what I expect. The next function 
+can either check if a combination of columns uniquely specify the observations or
+try and find a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
+
+```{r check_id_ex}
+
+check_id(mtcars, cyl, mpg)
+
+```
+
+It will tell you if the combination you gave determines a specific row. You can also use it
+to try and search for a unique combination of variables by only supplying the data frame:
+```{r check_id_ex2}
+
+check_id(mtcars)
+
+```
+
+
