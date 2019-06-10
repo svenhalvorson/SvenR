@@ -101,7 +101,7 @@ check_id = function(df, ..., max_depth = 3){
 
       if(sum_nonunique == 0){
         if(unique_found == 0){
-          cat('Unique keys(s) within ', df_name, ':\n', sep = '')
+          cat('Unique key(s) within ', df_name, ':\n', sep = '')
         }
         cat('\t', paste(combo, collapse = ' * '), '\n', sep = '')
         unique_found = 1
