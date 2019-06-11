@@ -2,7 +2,7 @@
 % Please edit documentation in R/col_miss.R
 \name{col_miss}
 \alias{col_miss}
-\title{Column Missing Counts}
+\title{Column Missing %}
 \usage{
 col_miss(df, empty_string = FALSE)
 }
@@ -12,7 +12,7 @@ col_miss(df, empty_string = FALSE)
 \item{empty_string}{Should only white space values be treated as NA?}
 }
 \description{
-Count missing values by column
+Percent of values missing by column
 }
 \note{
 Likely to be used interactively
@@ -20,9 +20,9 @@ Likely to be used interactively
 \examples{
 set.seed(1)
 dat = c('X', 'Y', 'Z', '', NA)
-df = tibble(a = sample(dat, size = 5, replace = TRUE),
-            b = sample(dat, size = 5, replace = TRUE),
-            c = sample(dat, size = 5, replace = TRUE))
+df = tibble::tibble(a = sample(dat, size = 5, replace = TRUE),
+                    b = sample(dat, size = 5, replace = TRUE),
+                    c = sample(dat, size = 5, replace = TRUE))
 df
 col_miss(df)
 col_miss(df, empty_string = TRUE)
