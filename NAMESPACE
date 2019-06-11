@@ -3,7 +3,6 @@
 export("%>%")
 export("%nin%")
 export(check_id)
-export(check_id2)
 export(clear)
 export(col_miss)
 export(count_ids)

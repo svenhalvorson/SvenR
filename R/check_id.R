@@ -27,20 +27,20 @@ check_id = function(df, ..., max_depth = 3){
   # Preliminaries -----------------------------------------------------------
 
   # Capture df's name & row count
-  df_name = enquo(df) %>%
-    quo_name
+  df_name = dplyr::enquo(df) %>%
+    (dplyr::quo_name)
   nrow_df = nrow(df)
 
   # Check specific combination ----------------------------------------------
   # Scenario 1 is where we want to check if a combination of columns is unique
-  arguments = enquos(...) %>%
-    map_chr(quo_name)
+  arguments = dplyr::enquos(...) %>%
+    purrr::map_chr(dplyr::quo_name)
   # if the user supplied a character vector, clean it up:
   if(length(arguments) == 1){
-    if(str_detect(string = arguments, pattern = 'c\\(')){
+    if(stringr::str_detect(string = arguments, pattern = 'c\\(')){
       arguments = arguments %>%
-        str_remove_all('c\\(|\\)|\"') %>%
-        str_split(pattern = ', ', simplify = TRUE) %>%
+        stringr::str_remove_all('c\\(|\\)|\"') %>%
+        stringr::str_split(pattern = ', ', simplify = TRUE) %>%
         .[1,]}
   }
 
@@ -73,7 +73,7 @@ check_id = function(df, ..., max_depth = 3){
   col_combos = function(n){
     combo = colnames(df) %>%
       combn(m = n) %>%
-      as_tibble(.name_repair = 'minimal') %>%
+      tibble::as_tibble(.name_repair = 'minimal') %>%
       as.list()
   }
 
@@ -83,7 +83,7 @@ check_id = function(df, ..., max_depth = 3){
 
   # maybe make a data frame to store the output:
   output = matrix(NA_character_, nrow = 0, ncol = max_depth + 3) %>%
-    as_tibble(.name_repair = 'minimal')
+    tibble::as_tibble(.name_repair = 'minimal')
 
 
 
@@ -128,14 +128,14 @@ check_id = function(df, ..., max_depth = 3){
   # if we don't find a unique combo, give the nearest one:
   if(unique_found == 0){
     closest_unique = output %>%
-      filter(n_nonunique == min(n_nonunique))
+      dplyr::filter(n_nonunique == min(n_nonunique))
     pats = closest_unique[1:max_depth] %>%
       apply(MARGIN = 1, FUN = paste, collapse = ' * ') %>%
-      str_remove_all(pattern = ' \\* NA')
+      stringr::str_remove_all(pattern = ' \\* NA')
     pats = paste(pats, collapse = '\n\t\t\t' )
     # kind of going to a lot of effort for the case where there are multiple
     # equally 'unique' patterns...
-    cat('\nNo unique keys found.\nClosest key(s):\t\t', pats, '\n\n',
+    cat('\nNo unique keys found.\nClosest key(s):\t\t\t', pats, '\n\n',
         'With any of these keys...\n',
         'Total rows:\t\t', nrow_df, '\n',
         '# non-unique rows:\t', closest_unique[['n_nonunique']][1], '\n',
