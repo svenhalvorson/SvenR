@@ -1,4 +1,4 @@
-#' Column Missing %
+#' Column Missing Percent
 #' @description Percent of values missing by column
 #' @param df A data frame
 #' @param empty_string Should only white space values be treated as NA?

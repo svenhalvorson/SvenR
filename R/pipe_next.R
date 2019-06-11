@@ -19,8 +19,8 @@ pipe_next = function(){
     text = rstudioapi::getSourceEditorContext()$content[row]
     text = substr(text, 1, col-1)
     # cut leading spaces:
-    lead_space = str_extract(string = text, pattern = '^ *')
-    text = str_remove(string = text, pattern = '^ *')
+    lead_space = stringr::str_extract(string = text, pattern = '^ *')
+    text = stringr::str_remove(string = text, pattern = '^ *')
     text = paste0(' = ', text, ' %>% \n', lead_space, '  ')
     # insert it
     rstudioapi::insertText(location = selection, text, id = doc_id)

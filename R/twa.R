@@ -18,11 +18,11 @@
 #' @param ref_dir the direction to compute the average relative to ref, one of \code{c('raw', 'above', 'below', 'about')}
 #' @return a data frame containing any grouping variables, the computed twa, and some other summary statistics
 #' @examples
-#' start_date = ymd_hms('2019-01-01 00:00:00')
-#' time_dat = tibble(id = c(1, 1, 1, 1, 2, 2),
-#'                   val = c(4, 6, 8, 6, 1, NA),
-#'                   t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
-#'                   t2 = 1:6)
+#' start_date = lubridate::ymd_hms('2019-01-01 00:00:00')
+#' time_dat = tibble::tibble(id = c(1, 1, 1, 1, 2, 2),
+#'                           val = c(4, 6, 8, 6, 1, NA),
+#'                           t = lubridate::minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
+#'                           t2 = 1:6)
 #' twa(df = time_dat, value_var = val, time_var = t, id)
 #' twa(df = time_dat, value_var = val, time_var = t2, method = 'left', ref = 7, ref_dir = 'below')
 #' @author Sven Halvorson
@@ -31,13 +31,13 @@ twa = function(df, value_var, time_var, ...,
                method = 'trapezoid', ref = 0, ref_dir = 'raw'){
 
   # capture the potential NSE
-  value_var = enquo(value_var)
-  value_var_s = quo_name(value_var)
-  time_var = enquo(time_var)
-  time_var_s = quo_name(time_var)
-  grouping_vars = enquos(...)
+  value_var = dplyr::enquo(value_var)
+  value_var_s = dplyr::quo_name(value_var)
+  time_var = dplyr::enquo(time_var)
+  time_var_s = dplyr::quo_name(time_var)
+  grouping_vars = dplyr::enquos(...)
   grouping_vars_s = grouping_vars %>%
-    map_chr(quo_name)
+    purrr::map_chr(dplyr::quo_name)
 
   # Check whether we have the right datatypes
   if(!is.data.frame(df)){
@@ -46,7 +46,7 @@ twa = function(df, value_var, time_var, ...,
   if(any(!c(value_var_s, time_var_s, grouping_vars_s) %in% colnames(df))){
     stop('supplied columns not found in df')
   }
-  if(!(is.numeric(df[[time_var_s]]) | is.POSIXct(df[[time_var_s]]))){
+  if(!(is.numeric(df[[time_var_s]]) | lubridate::is.POSIXct(df[[time_var_s]]))){
     stop('time_var must be numeric or POSIXct')
   }
   if(!is.numeric(df[[value_var_s]])){
@@ -69,38 +69,38 @@ twa = function(df, value_var, time_var, ...,
 
   # 1) We're sorted & grouped properly
   df = df %>%
-    arrange(!!time_var)
+    dplyr::arrange(!!time_var)
   if(length(grouping_vars) != 0){
     df = df %>%
-      group_by(!!!grouping_vars) %>%
-      arrange(!!!grouping_vars)
+      dplyr::group_by(!!!grouping_vars) %>%
+      dplyr::arrange(!!!grouping_vars)
   }
 
   # 2) If there are missing outputs or times, record and then delete them.
   original_readings = df %>%
-    summarize(n_meas = n())
+    dplyr::summarize(n_meas = dplyr::n())
 
   miss_output = df %>%
-    mutate(missing_either = pmax(is.na(!!time_var), is.na(!!value_var))) %>%
-    summarize(n_na = sum(missing_either))
+    dplyr::mutate(missing_either = pmax(is.na(!!time_var), is.na(!!value_var))) %>%
+    dplyr::summarize(n_na = sum(missing_either))
   df = df %>%
-    filter(!is.na(!!value_var),
-           !is.na(!!time_var))
+    dplyr::filter(!is.na(!!value_var),
+                  !is.na(!!time_var))
 
   # 3) We have only one reading per time point*group
   df = df %>%
-    group_by(!!time_var, add = TRUE) %>%
-    summarize(!!value_var := median(!!value_var)) %>%
-    ungroup
+    dplyr::group_by(!!time_var, add = TRUE) %>%
+    dplyr::summarize(!!value_var := median(!!value_var)) %>%
+    (dplyr::ungroup)
 
   # regroup if needed to count actual data used:
   if(length(grouping_vars) != 0){
     df = df %>%
-      group_by(!!!grouping_vars) %>%
-      arrange(!!!grouping_vars)
+      dplyr::group_by(!!!grouping_vars) %>%
+      dplyr::arrange(!!!grouping_vars)
   }
   used_readings = df %>%
-    summarize(n_used = n())
+    dplyr::summarize(n_used = dplyr::n())
 
 
   # Compute TWA -------------------------------------------------------------
@@ -109,46 +109,46 @@ twa = function(df, value_var, time_var, ...,
   # which method of computing it we'll use and whether we're using
   # a reference value
   multiplier = ifelse(ref_dir == 'below', -1, 1)
-  lead_lag = ifelse(method == 'right', lag, lead)
-  difference_fun = ifelse(is.POSIXct(df[[time_var_s]]),
+  lead_lag = ifelse(method == 'right', dplyr::lag, dplyr::lead)
+  difference_fun = ifelse(lubridate::is.POSIXct(df[[time_var_s]]),
                           function(x, y){difftime(x, y, units = 'mins')},
                           function(x, y){x - y})
 
   # Now create the times and values:
   df = df %>%
-    mutate(method = method,
-           dir = ref_dir,
-           time_shift = lead_lag(!!time_var),
-           time_diff = difference_fun(!!time_var, time_shift),
-           time_diff = abs(as.numeric(time_diff)),
-           lead_val = lead(!!value_var),
-           new_val = case_when(method == 'trapezoid' ~
-                                 multiplier*(0.5*(lead_val + !!value_var) - ref),
-                               dir == 'about' ~ abs(!!value_var - ref),
-                               TRUE ~ multiplier*(!!value_var - ref)),
-           weighted_val = new_val*time_diff,
-           weighted_val = case_when(dir == 'raw' ~ weighted_val,
-                                    TRUE ~ pmax(weighted_val, 0))) %>%
+    dplyr::mutate(method = method,
+                  dir = ref_dir,
+                  time_shift = lead_lag(!!time_var),
+                  time_diff = difference_fun(!!time_var, time_shift),
+                  time_diff = abs(as.numeric(time_diff)),
+                  lead_val = lead(!!value_var),
+                  new_val = dplyr::case_when(method == 'trapezoid' ~
+                                               multiplier*(0.5*(lead_val + !!value_var) - ref),
+                                             dir == 'about' ~ abs(!!value_var - ref),
+                                             TRUE ~ multiplier*(!!value_var - ref)),
+                  weighted_val = new_val*time_diff,
+                  weighted_val = dplyr::case_when(dir == 'raw' ~ weighted_val,
+                                                  TRUE ~ pmax(weighted_val, 0))) %>%
     # now summarize the times and values. We'll use a maximum
     # in the case that there is only one reading
-    summarize(total_time = sum(time_diff, na.rm = TRUE),
-              total_weight = sum(weighted_val, na.rm = TRUE),
-              max_measure = max(!!value_var),
-              max_gap = max(time_diff, na.rm = TRUE),
-              max_gap = replace(max_gap, is.infinite(max_gap), 0),
-              min_gap = min(time_diff, na.rm = TRUE),
-              min_gap = replace(min_gap, is.infinite(min_gap), 0)) %>%
-    mutate(twa = total_weight/total_time,
-           twa = case_when(total_time > 0 ~ twa,
-                           TRUE ~ max_measure)) %>%
+    dplyr::summarize(total_time = sum(time_diff, na.rm = TRUE),
+                     total_weight = sum(weighted_val, na.rm = TRUE),
+                     max_measure = max(!!value_var),
+                     max_gap = max(time_diff, na.rm = TRUE),
+                     max_gap = replace(max_gap, is.infinite(max_gap), 0),
+                     min_gap = min(time_diff, na.rm = TRUE),
+                     min_gap = replace(min_gap, is.infinite(min_gap), 0)) %>%
+    dplyr::mutate(twa = total_weight/total_time,
+                  twa = dplyr::case_when(total_time > 0 ~ twa,
+                                         TRUE ~ max_measure)) %>%
     # nifty trick to change the select based on whether grouping_vars were supplied
-    when(length(grouping_vars) == 0 ~ select(., twa, total_time, max_gap, min_gap),
-         ~ select(., !!!grouping_vars, twa, total_time, max_gap, min_gap))
+    purrr::when(length(grouping_vars) == 0 ~ dplyr::select(., twa, total_time, max_gap, min_gap),
+                ~ dplyr::select(., !!!grouping_vars, twa, total_time, max_gap, min_gap))
 
   # attach other measures and export ----------------------------------------
 
   # if we have no grouping variables:
-  bind_fun = ifelse(length(grouping_vars) == 0, bind_cols, function(x,y){suppressMessages(full_join(x,y))})
+  bind_fun = ifelse(length(grouping_vars) == 0, dplyr::bind_cols, function(x,y){suppressMessages(dplyr::full_join(x,y))})
 
   # join summaries and return
   df  %>%

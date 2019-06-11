@@ -190,9 +190,8 @@ it is less than 5.
 
 ### Checking IDs
 
-I often get data sets where I'm not sure if a set of variables uniquely identify observations, whether
-any set does, or if the count of specific variables has changed. I created a few functions
-(so far) that help with this. These are mostly for interactive use.
+I often get data where I'm not sure if a set of variables uniquely identify observations, whether
+any set does, or if the count of specific variables has changed. I created a few functions that help with these types of problems. They are mostly for interactive use.
 
 The first is simply a count of unique values for some supplied variables:
 
@@ -206,7 +205,7 @@ so you can see what changes a function will cause:
 
 ```{r count_ids_ex2}
 
-mtcars = mtcars %>% 
+mtcars %>% 
   count_ids(cyl, carb) %>% 
   dplyr::filter(cyl > 4) %>% 
   count_ids(cyl, carb)
@@ -258,7 +257,7 @@ to look at observations with the same IDs.
 
 ### Missing data
 
-Missing data causes problems for statistics and programming. I have a couple of functions that
+I have a couple of functions that
 I wrote to help identify missing data. First off, I just kept writing `sum(is.na(x))` so here it is:
 
 ```{r sum_na}

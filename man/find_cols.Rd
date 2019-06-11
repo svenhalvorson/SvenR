@@ -9,7 +9,7 @@ find_cols(df, ..., value = TRUE, ignore.case = TRUE)
 \arguments{
 \item{df}{A data frame}
 
-\item{...}{Regular expressions, quoted or not}
+\item{...}{Keys to search for. Regular expressions must be qutoed.}
 
 \item{value}{Should the column names or positions be returned?}
 
@@ -23,6 +23,7 @@ This is mostly for interactive use
 }
 \examples{
 find_cols(mtcars, ar, pg)
+find_cols(mtcars, '^a')
 find_cols(mtcars, 'ar', value = FALSE)
 }
 \author{

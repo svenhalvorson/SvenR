@@ -2,7 +2,7 @@
 % Please edit documentation in R/col_miss.R
 \name{col_miss}
 \alias{col_miss}
-\title{Column Missing %}
+\title{Column Missing Percent}
 \usage{
 col_miss(df, empty_string = FALSE)
 }

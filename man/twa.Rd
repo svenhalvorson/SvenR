@@ -39,11 +39,11 @@ and the number of values received, used, and omitted. When \code{time_var} is \c
 will default to minutes.
 }
 \examples{
-start_date = ymd_hms('2019-01-01 00:00:00')
-time_dat = tibble(id = c(1, 1, 1, 1, 2, 2),
-                  val = c(4, 6, 8, 6, 1, NA),
-                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
-                  t2 = 1:6)
+start_date = lubridate::ymd_hms('2019-01-01 00:00:00')
+time_dat = tibble::tibble(id = c(1, 1, 1, 1, 2, 2),
+                          val = c(4, 6, 8, 6, 1, NA),
+                          t = lubridate::minutes(c(0, 10, 15, 45, 0, 10)) + start_date,
+                          t2 = 1:6)
 twa(df = time_dat, value_var = val, time_var = t, id)
 twa(df = time_dat, value_var = val, time_var = t2, method = 'left', ref = 7, ref_dir = 'below')
 }

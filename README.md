@@ -98,7 +98,7 @@ This is sometimes useful if you have a benchmark value you're trying to compare 
 
 ### Checking IDs
 
-I often get data sets where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions (so far) that help with this. These are mostly for interactive use.
+I often get data where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions that help with these types of problems. They are mostly for interactive use.
 
 The first is simply a count of unique values for some supplied variables:
 
@@ -114,7 +114,7 @@ We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`. It's pipe-
 
 ``` r
 
-mtcars = mtcars %>% 
+mtcars %>% 
   count_ids(cyl, carb) %>% 
   dplyr::filter(cyl > 4) %>% 
   count_ids(cyl, carb)
@@ -134,8 +134,8 @@ check_id(mtcars, cyl, mpg)
 #> 
 #> Key: cyl * mpg 
 #>  Not unique within mtcars
-#>  71.4% of rows are unique 
-#>  6 non-unique rows
+#>  68.8% of rows are unique 
+#>  10 non-unique rows
 ```
 
 It will tell you if the combination you gave determines a specific row. You can also use it to try and search for a unique combination of variables by only supplying the data frame:
@@ -143,7 +143,7 @@ It will tell you if the combination you gave determines a specific row. You can 
 ``` r
 
 check_id(mtcars)
-#> Unique keys(s) within mtcars:
+#> Unique key(s) within mtcars:
 #>  mpg * wt
 #>  mpg * qsec
 #>  cyl * qsec
@@ -152,7 +152,6 @@ check_id(mtcars)
 #>  drat * qsec
 #>  wt * qsec
 #>  qsec * am
-#>  qsec * gear
 #>  qsec * carb
 ```
 
@@ -163,12 +162,12 @@ The function starts searching by single columns, then tries pairs of columns, up
 check_id(mtcars, max_depth = 1)
 #> 
 #> No unique keys found.
-#> Closest key(s):      drat
+#> Closest key(s):          mpg
 #> 
 #> With any of these keys...
-#> Total rows:      21
-#> # non-unique rows:   13
-#> Percent unique rows: 38.1%
+#> Total rows:      32
+#> # non-unique rows:   14
+#> Percent unique rows: 56.2%
 ```
 
 Lastly, here's a variation on `duplicated` called `dupes` that I find much more useful for investigating. It flags every observation with at least one other duplicate:
@@ -195,19 +194,30 @@ mtcars %>%
 #> 13 3.23     FALSE
 #> 14 3.54     FALSE
 #> 15 3.62     FALSE
-#> 16 3.73     FALSE
-#> 17 3.90      TRUE
-#> 18 3.90      TRUE
-#> 19 3.92      TRUE
-#> 20 3.92      TRUE
-#> 21 4.22     FALSE
+#> 16 3.69     FALSE
+#> 17 3.70     FALSE
+#> 18 3.73     FALSE
+#> 19 3.77     FALSE
+#> 20 3.85     FALSE
+#> 21 3.90      TRUE
+#> 22 3.90      TRUE
+#> 23 3.92      TRUE
+#> 24 3.92      TRUE
+#> 25 3.92      TRUE
+#> 26 4.08      TRUE
+#> 27 4.08      TRUE
+#> 28 4.11     FALSE
+#> 29 4.22      TRUE
+#> 30 4.22      TRUE
+#> 31 4.43     FALSE
+#> 32 4.93     FALSE
 ```
 
 Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated to try and differentiate the observations. I like the STATA function 'duplicates tag' that makes it easier to look at observations with the same IDs.
 
 ### Missing data
 
-Missing data causes problems for statistics and programming. I have a couple of functions that I wrote to help identify missing data. First off, I just kept writing `sum(is.na(x))` so here it is:
+I have a couple of functions that I wrote to help identify missing data. First off, I just kept writing `sum(is.na(x))` so here it is:
 
 ``` r
 
@@ -222,12 +232,12 @@ Then I used this to have a summary function, `col_miss`, for a data set. You can
 tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss
-#> x y 
-#> 4 1
+#>      x      y 
+#> "66.7" "16.7"
 
 tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss(empty_string = TRUE)
-#> x y 
-#> 4 3
+#>      x      y 
+#> "66.7" "50.0"
 ```
