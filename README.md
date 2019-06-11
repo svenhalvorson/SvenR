@@ -1,12 +1,13 @@
 
-IN PROGRESS (2019-06-05)!
+IN PROGRESS (2019-06-11)!
 =========================
 
 **Stuff I'm working on right now:**
 
--   Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things
+-   ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
 -   Trying to make a shiny gadget that helps you manually create crosswalks
 -   Adding explainers in this file
+-   Decide which functions should use NSE and which should not
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 SvenR
