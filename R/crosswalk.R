@@ -1,67 +1,52 @@
-# figuring this out still
+#' Create Crosswalk
+#' @description Manually create a crosswalk from one or more columns of a data frame.
+#' @param df A data frame
+#' @param ... Coluumns within \code{df}
+#' @param all_combos Should combinations of \code{...} not present in \code{df} be created?
+#' @return Code to rstudio a script that generates the crosswalk.
+#' @author Sven Halvorson
+#' @examples
+#' iris %>%
+#'   mutate(species_chr = Species) %>%
+#'   crosswalk(species_chr)
+#' @export
 
-library(shiny)
-library(miniUI)
-library(rhandsontable)
-
-myGadgetFunc <- function(inputValue1, inputValue2) {
-
-  ui <- miniPage(
-    gadgetTitleBar("My Gadget"),
-    miniContentPanel(
-      # Define layout, inputs, outputs
-    )
-  )
-
-  server <- function(input, output, session) {
-    # Define reactive expressions, outputs, etc.
-
-    # When the Done button is clicked, return a value
-    observeEvent(input$done, {
-      returnValue <- ...
-      stopApp(returnValue)
-    })
-  }
-
-  runGadget(ui, server)
-}
-
-
-# Pseudo:
-
-# manual_cross = function(df, grouping, all_combos = FALSE)
-
-# take in data frame, find all distinct combinations of grouping variables (possibly non-existant ones)
-# create a new column fill with one of the columns in grouping
-# create the pane, allow editing of nrew column only
-# insert a dput statement into the user's script of the cross table
 
 crosswalk <- function(df, ..., all_combos = FALSE) {
 
   # get the dataframe name and grouping arguments
-  df_name = enquo(df) %>%
-    quo_name
-  arguments = enquos(...)
+  df_name = dplyr::enquo(df) %>%
+    (dplyr::quo_name)
+  arguments = dplyr::enquos(...)
   arguments_chr = arguments %>%
-    map_chr(quo_name)
+    purrr::map_chr(dplyr::quo_name)
   new_col = paste0('new_', arguments_chr[1])
 
+    # Check some things in case...
+  if(any(!is.data.frame(df),
+         sum(arguments_chr %in% colnames(df)) != length(arguments_chr))){
+    stop('df must be a data frame and ... must be columns within df')
+  }
+  # Check if the columns are factors... doesn't work as well that way
+  fct_check = df[arguments_chr] %>%
+    purrr::map_lgl(is.factor)
+  if(any(!fct_check)){
+    warning('Factors do not work as well as strings for this function')
+  }
 
   # find distinct or expand
-  dist_exp = ifelse(all_combos, expand, distinct)
+  dist_exp = ifelse(all_combos, dplyr::expand, dplyr::distinct)
   df = df %>%
     dist_exp(!!!arguments)
   # couldn't quite get the mutate to work ><
   df[new_col] = df[arguments_chr[1]]
 
   # This is the UI for the shiny gadget:
-  ui <- miniPage(
-    gadgetTitleBar(paste0("Crosswalk for ", paste(arguments_chr, collapse = ', '), ' in ', df_name)),
-    miniContentPanel(
-      # set up the hands on table:
-      df %>%
-        rhandsontable(readOnly = TRUE) %>%
-        hot_col(new_col, readOnly = FALSE)
+  ui <- miniUI::miniPage(
+    miniUI::gadgetTitleBar(title = paste0("Crosswalk for ", paste(arguments_chr, collapse = ', '), ' in ', df_name),
+                           right = miniUI::miniTitleBarButton("done", "Accept", primary = TRUE)),
+    miniUI::miniContentPanel(
+      rhandsontable::rHandsontableOutput('hot')
     )
   )
 
@@ -69,11 +54,38 @@ crosswalk <- function(df, ..., all_combos = FALSE) {
     # Define reactive expressions, outputs, etc.
 
     # When the Done button is clicked, return a value
-    observeEvent(input$done, {
-      returnValue <- dput
-      stopApp(returnValue)
+    shiny::observeEvent(input$done, {
+      returnValue <- rhandsontable::hot_to_r(input$hot)
+      shiny::stopApp(returnValue)
+    })
+
+    # Show the handsontable:
+    output$hot <- rhandsontable::renderRHandsontable({
+      df %>%
+        rhandsontable::rhandsontable(readOnly = TRUE) %>%
+        rhandsontable::hot_col(new_col, readOnly = FALSE)
     })
   }
 
-  runGadget(ui, server)
+  # run the gadget
+  out = shiny::runGadget(ui, server)
+
+  # Now do some of that code formatting stuff we learned how to do with pipe_next
+  # I think probably the best way for the user (me) to work with this is just to
+  # call it on a blank line and then have the text inserted there
+  selection = rstudioapi::getSourceEditorContext()$selection[[1]]$range
+  left = selection$start[2]
+  doc_id = rstudioapi::getSourceEditorContext()$id
+
+  # capture leading spaces
+  lead_space = rep(' ', times = left-1) %>%
+    paste(collapse = '')
+  text = paste0(lead_space, df_name, '_cross = ', paste(deparse(out), collapse = ''))
+
+  # put it into the editor
+  rstudioapi::insertText(location = selection, text, id = doc_id)
+
+
 }
+
+
