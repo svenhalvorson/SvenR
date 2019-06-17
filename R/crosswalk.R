@@ -3,8 +3,13 @@
 #' @param df A data frame
 #' @param ... Coluumns within \code{df}
 #' @param all_combos Should combinations of \code{...} not present in \code{df} be created?
-#' @return Code to rstudio a script that generates the crosswalk.
+#' @return Code to a rstudio script that generates the crosswalk.
 #' @author Sven Halvorson
+#' @details Often text data needs to be binned or converted. Doing this via
+#' large sets of regular expressions sometimes works but often it's faster just
+#' to make a crosswalk yourself. \code{crosswalk} creates the unique combination
+#' of one or more columns within a data frame, allows the user to edit the 'new
+#' values' and returns code to produce the crosswalk.
 #' @examples
 #' iris %>%
 #'   mutate(species_chr = Species) %>%
@@ -30,7 +35,7 @@ crosswalk <- function(df, ..., all_combos = FALSE) {
   # Check if the columns are factors... doesn't work as well that way
   fct_check = df[arguments_chr] %>%
     purrr::map_lgl(is.factor)
-  if(any(!fct_check)){
+  if(any(fct_check)){
     warning('Factors do not work as well as strings for this function')
   }
 
