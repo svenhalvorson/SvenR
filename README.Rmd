@@ -1,11 +1,16 @@
 ---
-output: github_document
+title: 'SvenR'
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
 ---
 
-#### IN PROGRESS (2019-06-11) Stuff I'm working on right now:
+**IN PROGRESS (2019-06-17) Stuff I'm working on right now:**
 
 * ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
-* Trying to make a shiny gadget that helps you manually create crosswalks
+* ~~Trying to make a shiny gadget that helps you manually create crosswalks~~
+    + Figure out what convention or protections to use to write code to the source file
 * Adding examples of code usage in this file
 * Decide which functions should use NSE and which should not
 
@@ -30,7 +35,6 @@ library('kableExtra')
 library('SvenR')
 ```
 
-## SvenR
 
 I like to pretend I'm a software developer so I created this little package. It's probably
 completely unnecessary as I frequently find better versions of the functions I write later.
@@ -51,7 +55,7 @@ If you find any horrendous errors, please let me know at svenpubmail@gmail.com
 ### Time Weighted Averages
 
 Time weighted averages are a way of summarizing a numerical variable over
-many time points. Often it's useful when the measurements occur at irregular
+many time points. It's often useful when the measurements occur at irregular
 intervals. Basically we're multiplying the values by how long they occur for
 and then dividing by the total time. It's very similar to taking a Riemann sum.
 
@@ -68,7 +72,7 @@ kable(twa_ex, align = 'c', format = 'markdown' )
 ```
 
 The idea here is that have an **id** variable, a **val**ue variable,
-and two **t**ime variables. We want to summarize the value over time.
+and a **t**ime variable. We want to summarize the value over time.
 There are three methods of counting the points that are supported:
 trapezoids and left/right endpoints.
 
@@ -213,7 +217,7 @@ mtcars %>%
 
 I often use this to make sure my merges are doing what I expect. The next function 
 can either check if a combination of columns uniquely specify the observations or
-try and find a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
+try and find such a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
 
 ```{r check_id_ex}
 
@@ -230,7 +234,8 @@ check_id(mtcars)
 ```
 
 The function starts searching by single columns, then tries pairs of columns, up to the number
-of columns equal to the value supplied to `max_depth` before giving up. If no unique keys were
+of columns equal to the value supplied to `max_depth` before giving up. In this case, any of those 9 pairs of variables uniquely
+specify the observations. If no unique keys are
 found, the closest combination(s) are listed:
 ```{r check_id_ex3}
 
@@ -251,7 +256,7 @@ mtcars %>%
 ```
 
 Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated 
-to try and differentiate the observations. I like the STATA function 'duplicates tag' that makes it easier
+to try and differentiate the observations. This was inspired by the STATA function 'duplicates tag' that makes it easier
 to look at observations with the same IDs.
 
 ### Missing data
@@ -265,17 +270,35 @@ sum_na(x = c(NA, NA, 3, 4, NA, NA))
 
 ```
 
-Then I used this to have a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
+I also wrote a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
 
 ```{r col_miss}
 
-tibble(x = c(NA, NA, 3, 4, NA, NA),
+tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss
 
-tibble(x = c(NA, NA, 3, 4, NA, NA),
+tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss(empty_string = TRUE)
 
 ```
 
+I'm not sure about you but at my old job I always received excel sheets with vertically merged cells. When you load these
+up, they have a bunch of blank entries that should be repititions. Here's a function that can deal with that:
+
+```{r fill_down}
+
+NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+fill_down(NM)
+fill_down(NM, empty_string = TRUE)
+fill_down(NM, reverse = TRUE)
+```
+
+I later found out that the function `tidyr::fill` does almost the same thing. `fill_down` does two things differently
+though:
+
+* It can treat blank strings as missing
+* It can operate on vectors outside of data frames
+
+For these reasons, I've kept it around but it's necessary most of the time.

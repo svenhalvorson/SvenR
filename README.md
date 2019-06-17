@@ -1,15 +1,20 @@
+SvenR
+================
 
-#### IN PROGRESS (2019-06-11) Stuff I'm working on right now:
+-   [Installation](#installation)
+-   [Time Weighted Averages](#time-weighted-averages)
+-   [Checking IDs](#checking-ids)
+-   [Missing data](#missing-data)
+
+**IN PROGRESS (2019-06-17) Stuff I'm working on right now:**
 
 -   ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
--   Trying to make a shiny gadget that helps you manually create crosswalks
+-   ~~Trying to make a shiny gadget that helps you manually create crosswalks~~
+    -   Figure out what convention or protections to use to write code to the source file
 -   Adding examples of code usage in this file
 -   Decide which functions should use NSE and which should not
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-SvenR
------
-
 I like to pretend I'm a software developer so I created this little package. It's probably completely unnecessary as I frequently find better versions of the functions I write later. Creating a library is fun though, so maybe you will enjoy it too. I'll show some examples of what the code can do and what my ideas were behind it.
 
 ### Installation
@@ -25,7 +30,7 @@ If you find any horrendous errors, please let me know at <svenpubmail@gmail.com>
 
 ### Time Weighted Averages
 
-Time weighted averages are a way of summarizing a numerical variable over many time points. Often it's useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
+Time weighted averages are a way of summarizing a numerical variable over many time points. It's often useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
 
 Here's some example data:
 
@@ -38,7 +43,7 @@ Here's some example data:
 |  2  |  1  | 2019-01-01 00:00:00 |
 |  2  |  NA | 2019-01-01 00:10:00 |
 
-The idea here is that have an **id** variable, a **val**ue variable, and two **t**ime variables. We want to summarize the value over time. There are three methods of counting the points that are supported: trapezoids and left/right endpoints.
+The idea here is that have an **id** variable, a **val**ue variable, and a **t**ime variable. We want to summarize the value over time. There are three methods of counting the points that are supported: trapezoids and left/right endpoints.
 
 Visually, the id \#1's values look like this:
 
@@ -124,7 +129,7 @@ mtcars %>%
 #> 1   2    6
 ```
 
-I often use this to make sure my merges are doing what I expect. The next function can either check if a combination of columns uniquely specify the observations or try and find a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
+I often use this to make sure my merges are doing what I expect. The next function can either check if a combination of columns uniquely specify the observations or try and find such a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
 
 ``` r
 
@@ -153,7 +158,7 @@ check_id(mtcars)
 #>  qsec * carb
 ```
 
-The function starts searching by single columns, then tries pairs of columns, up to the number of columns equal to the value supplied to `max_depth` before giving up. If no unique keys were found, the closest combination(s) are listed:
+The function starts searching by single columns, then tries pairs of columns, up to the number of columns equal to the value supplied to `max_depth` before giving up. In this case, any of those 9 pairs of variables uniquely specify the observations. If no unique keys are found, the closest combination(s) are listed:
 
 ``` r
 
@@ -211,7 +216,7 @@ mtcars %>%
 #> 32 4.93     FALSE
 ```
 
-Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated to try and differentiate the observations. I like the STATA function 'duplicates tag' that makes it easier to look at observations with the same IDs.
+Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated to try and differentiate the observations. This was inspired by the STATA function 'duplicates tag' that makes it easier to look at observations with the same IDs.
 
 ### Missing data
 
@@ -223,19 +228,40 @@ sum_na(x = c(NA, NA, 3, 4, NA, NA))
 #> [1] 4
 ```
 
-Then I used this to have a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
+I also wrote a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
 
 ``` r
 
-tibble(x = c(NA, NA, 3, 4, NA, NA),
+tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss
-#>      x      y 
-#> "66.7" "16.7"
+#> [1] "66.7%" "16.7%"
 
-tibble(x = c(NA, NA, 3, 4, NA, NA),
+tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
        y = c(NA, 'a', 'b', 'c', '', '')) %>% 
   col_miss(empty_string = TRUE)
-#>      x      y 
-#> "66.7" "50.0"
+#> [1] "66.7%" "50.0%"
 ```
+
+I'm not sure about you but at my old job I always received excel sheets with vertically merged cells. When you load these up, they have a bunch of blank entries that should be repititions. Here's a function that can deal with that:
+
+``` r
+
+NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+fill_down(NM)
+#> [1] NA        "Ruidosa" "Ruidosa" ""        ""        "Corona"  "Corona" 
+#> [8] "Roswell"
+fill_down(NM, empty_string = TRUE)
+#> [1] NA        "Ruidosa" "Ruidosa" "Ruidosa" "Ruidosa" "Corona"  "Corona" 
+#> [8] "Roswell"
+fill_down(NM, reverse = TRUE)
+#> [1] "Ruidosa" "Ruidosa" ""        ""        "Corona"  "Corona"  "Roswell"
+#> [8] "Roswell"
+```
+
+I later found out that the function `tidyr::fill` does almost the same thing. `fill_down` does two things differently though:
+
+-   It can treat blank strings as missing
+-   It can operate on vectors outside of data frames
+
+For these reasons, I've kept it around but it's necessary most of the time.
