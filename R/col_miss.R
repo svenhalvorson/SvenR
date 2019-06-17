@@ -43,6 +43,7 @@ col_miss = function(df, empty_string = FALSE){
     }
   }
 
-  vapply(X = df, FUN = check_na, FUN.VALUE = character(1))
+  vapply(X = df, FUN = check_na, FUN.VALUE = character(1)) %>%
+    paste0('%')
 
 }
