@@ -19,6 +19,26 @@
 
 crosswalk <- function(df, ..., all_combos = FALSE) {
 
+  # So I decided that the first thing I should do is just try
+  # and make sure that we're not overwriting peoples code so
+  # let's look for where the cursor is and put on some guards
+  selection = rstudioapi::getSourceEditorContext()$selection[[1]]$range
+  left = selection$start[2]
+  right = selection$end[2]
+  top = selection$start[1]
+  bottom = selection$start[1]
+  highlight_text = rstudioapi::getSourceEditorContext()$content[selection$start[1]]
+
+  # conditions to execute:
+  highlight_portion = left != right & top == bottom
+  highlight_single_line = left == right &  top == bottom
+  contains_cross = stringr::str_detect(highlight_text, '[:blank:]*crosswalk\\(.+\\)[:blank:]*')
+
+  if(!contains_cross | !(highlight_portion | highlight_single_line)){
+    stop('Highlight only the crosswalk statement on a single line')
+  }
+
+
   # get the dataframe name and grouping arguments
   df_name = dplyr::enquo(df) %>%
     (dplyr::quo_name)
@@ -78,8 +98,6 @@ crosswalk <- function(df, ..., all_combos = FALSE) {
   # Now do some of that code formatting stuff we learned how to do with pipe_next
   # I think probably the best way for the user (me) to work with this is just to
   # call it on a blank line and then have the text inserted there
-  selection = rstudioapi::getSourceEditorContext()$selection[[1]]$range
-  left = selection$start[2]
   doc_id = rstudioapi::getSourceEditorContext()$id
 
   # capture leading spaces
