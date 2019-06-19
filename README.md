@@ -5,6 +5,7 @@ SvenR
 -   [Time Weighted Averages](#time-weighted-averages)
 -   [Checking IDs](#checking-ids)
 -   [Missing data](#missing-data)
+-   [Creating Crosswalks](#creating-crosswalks)
 
 **IN PROGRESS (2019-06-17) Stuff I'm working on right now:**
 
@@ -279,3 +280,5 @@ I later found out that the function `tidyr::fill` does almost the same thing. `f
 For these reasons I've kept it around but it's not necessary most of the time.
 
 ### Creating Crosswalks
+
+Frequently I encounter text data that I want to bin. This often comes about when I have hand written records or data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions but I often find these unreliable if the underlying data changes. Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this. conversion method
