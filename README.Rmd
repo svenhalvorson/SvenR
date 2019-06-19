@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   #out.width = "100%",
-  fig.pos = 'c',
+  #fig.pos = 'c',
   fig.align = "center"
 )
 ```
@@ -132,7 +132,7 @@ but they can be different in a small data set like this.
 
 The time weighted average using left endpoints is this:
 
-$$\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89$$
+\[\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89\]
 
 Using the function:
 
@@ -319,4 +319,3 @@ Frequently I encounter text data that I want to bin. This often comes about when
 data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions
 but I often find these unreliable if the underlying data changes.
 Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this.
-conversion method 
