@@ -4,7 +4,7 @@
 #' @param empty_string Should empty strings be treated as NA?
 #' @author Sven Halvorson
 #' @examples
-#' NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+#' NM = c(NA, 'Ruidoso', NA, '', NA, 'Corona', NA, 'Roswell')
 #' fill_down(NM)
 #' fill_down(NM, empty_string = TRUE)
 #' fill_down(NM, reverse = TRUE)

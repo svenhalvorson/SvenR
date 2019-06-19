@@ -14,10 +14,17 @@ crosswalk(df, ..., all_combos = FALSE)
 \item{all_combos}{Should combinations of \code{...} not present in \code{df} be created?}
 }
 \value{
-Code to rstudio a script that generates the crosswalk.
+Code to a rstudio script that generates the crosswalk.
 }
 \description{
 Manually create a crosswalk from one or more columns of a data frame.
+}
+\details{
+Often text data needs to be binned or converted. Doing this via
+large sets of regular expressions sometimes works but often it's faster just
+to make a crosswalk yourself. \code{crosswalk} creates the unique combination
+of one or more columns within a data frame, allows the user to edit the 'new
+values' and returns code to produce the crosswalk.
 }
 \examples{
 iris \%>\%

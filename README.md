@@ -49,11 +49,12 @@ Visually, the id \#1's values look like this:
 
 <img src="man/figures/README-twa_types-1.png" style="display: block; margin: auto;" />
 
-The time weighted average is the area in yellow divided by the total time (45 min). The methods will not compute very different totals if the number of data points is large but they can look different in a small data set like this.
+The time weighted average is the area in yellow divided by the total time (45 min). The methods will produce similar results if the number of data points is large but they can be different in a small data set like this.
 
 The time weighted average using left endpoints is this:
 
-<!-- $$\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89$$ -->
+![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](https://latex.codecogs.com/png.latex?%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89 "\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89")
+
 Using the function:
 
 ``` r
@@ -78,10 +79,10 @@ Some notes:
 
 I also allowed for computing this summary statistic relative to a reference value. The four `ref_dir` modes are as follows:
 
--   **Raw**: no alterations to the data
--   **Above x**: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
--   **Below x**: The converse of above.
--   **About x**: The absolute distance from x is used.
+-   `raw`: no alterations to the data
+-   `above` x: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
+-   `below` x: The converse of `above`.
+-   `about` x: The absolute distance from x is used.
 
 Here's an example of computing the time weighted average above 5:
 
@@ -97,7 +98,7 @@ twa(df = twa_ex, value_var = val, time_var = t, id, ref = 5, ref_dir = 'above', 
 
 <img src="man/figures/README-twa_above-1.png" style="display: block; margin: auto;" />
 
-This is sometimes useful if you have a benchmark value you're trying to compare to. Note that it uses the entire 45 minutes as the denominator even though the first reading was set to zero because it is less than 5.
+This can be useful if you have a benchmark value you're trying to compare to. Note that it uses the entire 45 minutes as the denominator even though the first reading was set to zero because it is less than 5.
 
 ### Checking IDs
 
@@ -141,7 +142,7 @@ check_id(mtcars, cyl, mpg)
 #>  10 non-unique rows
 ```
 
-It will tell you if the combination you gave determines a specific row. You can also use it to try and search for a unique combination of variables by only supplying the data frame:
+You can also use it to try and search for a unique combination of variables by only supplying the data frame:
 
 ``` r
 
@@ -228,34 +229,45 @@ sum_na(x = c(NA, NA, 3, 4, NA, NA))
 #> [1] 4
 ```
 
-I also wrote a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
+I also wrote a summary function, `col_miss`, for a data set. It computes the percent of observations that are missing for each column:
 
 ``` r
 
-tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
-  col_miss
-#> [1] "66.7%" "16.7%"
+dat1 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
+       y = c(NA, 'a', 'b', 'c', '', ''))
 
-tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
-  col_miss(empty_string = TRUE)
-#> [1] "66.7%" "50.0%"
+col_miss(dat1)
+#> [1] "Percent missing by column for dat1"
+#>       x       y 
+#> "66.7%" "16.7%"
+```
+
+You can tell it to consider empty strings as missing:
+
+``` r
+
+dat2 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
+       y = c(NA, 'a', 'b', 'c', '', ''))
+
+col_miss(dat2, empty_string = TRUE)
+#> [1] "Percent missing by column for dat2"
+#>       x       y 
+#> "66.7%" "50.0%"
 ```
 
 I'm not sure about you but at my old job I always received excel sheets with vertically merged cells. When you load these up, they have a bunch of blank entries that should be repititions. Here's a function that can deal with that:
 
 ``` r
 
-NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+NM = c(NA, 'Ruidoso', NA, '', NA, 'Corona', NA, 'Roswell')
 fill_down(NM)
-#> [1] NA        "Ruidosa" "Ruidosa" ""        ""        "Corona"  "Corona" 
+#> [1] NA        "Ruidoso" "Ruidoso" ""        ""        "Corona"  "Corona" 
 #> [8] "Roswell"
 fill_down(NM, empty_string = TRUE)
-#> [1] NA        "Ruidosa" "Ruidosa" "Ruidosa" "Ruidosa" "Corona"  "Corona" 
+#> [1] NA        "Ruidoso" "Ruidoso" "Ruidoso" "Ruidoso" "Corona"  "Corona" 
 #> [8] "Roswell"
 fill_down(NM, reverse = TRUE)
-#> [1] "Ruidosa" "Ruidosa" ""        ""        "Corona"  "Corona"  "Roswell"
+#> [1] "Ruidoso" "Ruidoso" ""        ""        "Corona"  "Corona"  "Roswell"
 #> [8] "Roswell"
 ```
 
@@ -264,4 +276,4 @@ I later found out that the function `tidyr::fill` does almost the same thing. `f
 -   It can treat blank strings as missing
 -   It can operate on vectors outside of data frames
 
-For these reasons, I've kept it around but it's necessary most of the time.
+For these reasons I've kept it around but it's not necessary most of the time.
