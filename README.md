@@ -11,7 +11,7 @@ SvenR
 
 -   ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
 -   ~~Trying to make a shiny gadget that helps you manually create crosswalks~~
-    -   Figure out what convention or protections to use to write code to the source file
+    -   ~~Figure out what convention or protections to use to write code to the source file~~
 -   Adding examples of code usage in this file
 -   Decide which functions should use NSE and which should not
 
@@ -282,3 +282,86 @@ For these reasons I've kept it around but it's not necessary most of the time.
 ### Creating Crosswalks
 
 Frequently I encounter text data that I want to bin. This often comes about when I have hand written records or data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions but I often find these unreliable if the underlying data changes. Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this.
+
+Here's an example data set of hospital visits to different departments:
+
+``` r
+med_table = tibble::tibble(dept = c('pulmonary',
+                            'pulmonary',
+                            'heart',
+                            'cardio',
+                            'cardio',
+                            'pulm'),
+                   visit = c('surgery',
+                             'surg',
+                             'visit',
+                             'surgery',
+                             'surgery',
+                             'office'))
+med_table
+#> # A tibble: 6 x 2
+#>   dept      visit  
+#>   <chr>     <chr>  
+#> 1 pulmonary surgery
+#> 2 pulmonary surg   
+#> 3 heart     visit  
+#> 4 cardio    surgery
+#> 5 cardio    surgery
+#> 6 pulm      office
+```
+
+To use this tool, call the `crosswalk` function on a data frame and supply the columns you wish to cross from:
+
+``` r
+
+crosswalk(med_table, dept, visit)
+```
+
+This will create a table in your Rstudio viewer:
+
+![](man/figures/README-crosswalk.PNG)
+
+The last column will always be whatever the first one you enter prefixed with 'new\_'. The last column is editable:
+
+![](man/figures/README-crosswalk2.PNG)
+
+Then when you hit accept, it will generate the code that creates your crosswalk:
+
+``` r
+
+med_table_cross = structure(list(dept = c("pulmonary", "pulmonary", "heart", "cardio", "pulm"), visit = c("surgery", "surg", "visit", "surgery", "office"), new_dept = c("pulm_surg", "pulm_surg", "heart_visit", "heart_surg", "pulm_visit")), row.names = c(NA, -5L), class = "data.frame")
+
+med_table_cross
+#>        dept   visit    new_dept
+#> 1 pulmonary surgery   pulm_surg
+#> 2 pulmonary    surg   pulm_surg
+#> 3     heart   visit heart_visit
+#> 4    cardio surgery  heart_surg
+#> 5      pulm  office  pulm_visit
+```
+
+Then you'll usually join it onto the original:
+
+``` r
+med_table %>% 
+  dplyr::left_join(med_table_cross)
+#> Joining, by = c("dept", "visit")
+#> # A tibble: 6 x 3
+#>   dept      visit   new_dept   
+#>   <chr>     <chr>   <chr>      
+#> 1 pulmonary surgery pulm_surg  
+#> 2 pulmonary surg    pulm_surg  
+#> 3 heart     visit   heart_visit
+#> 4 cardio    surgery heart_surg 
+#> 5 cardio    surgery heart_surg 
+#> 6 pulm      office  pulm_visit
+```
+
+I created this using the `rstudioapi` so it actually replaces the `crosswalk` command in the rstudio source editor with the result. The reason for this is that this way the `data.frame` can just be implanted into a script and other users will not need SvenR or the clicking and typing that created the crosswalk.
+
+I did create some safegaurds to try and prevent people (mostly me) from deleting their own code so it will not execute if you have multiple lines highlighted when you run `crosswalk` or the text of that line does not contain `crosswalk(.+)`.
+
+A few more notes:
+
+-   Notice that `med_table` had 6 observations but the cross has 5. This is because `crosswalk` only takes distinct combinations of the variables supplied.
+-   If you want to get cominations of variables not present in the data set, you can set `all_combos = TRUE` to use `expand` instead of `distinct`
