@@ -153,7 +153,7 @@ Some notes:
 * Records with missing values or times are removed
 * If multiple records occur at the same time, the median is used
 * If only one record is given for a particular combination of ids, it is returned
-* Nonstandard evaluation is used for all arguments
+* Nonstandard evaluation is used column names within the data frame
 * You can supply a numeric, non-`POSIXct` time vector
 
 I also allowed for computing this summary statistic relative to a reference value.
@@ -286,11 +286,7 @@ col_miss(dat1)
 You can tell it to consider empty strings as missing:
 
 ```{r col_miss2}
-
-dat2 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', ''))
-
-col_miss(dat2, empty_string = TRUE)
+col_miss(dat1, empty_string = TRUE)
 
 ```
 

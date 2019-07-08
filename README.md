@@ -1,22 +1,31 @@
 SvenR
 ================
 
--   [Installation](#installation)
--   [Time Weighted Averages](#time-weighted-averages)
--   [Checking IDs](#checking-ids)
--   [Missing data](#missing-data)
--   [Creating Crosswalks](#creating-crosswalks)
+  - [Installation](#installation)
+  - [Time Weighted Averages](#time-weighted-averages)
+  - [Checking IDs](#checking-ids)
+  - [Missing data](#missing-data)
+  - [Creating Crosswalks](#creating-crosswalks)
 
-**IN PROGRESS (2019-06-17) Stuff I'm working on right now:**
+**IN PROGRESS (2019-06-17) Stuff I’m working on right now:**
 
--   ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
--   ~~Trying to make a shiny gadget that helps you manually create crosswalks~~
-    -   ~~Figure out what convention or protections to use to write code to the source file~~
--   Adding examples of code usage in this file
--   Decide which functions should use NSE and which should not
+  - ~~Working on dependencies. I don’t want the package to attach
+    anything when loaded so I have to go through and add dplyr:: to
+    things~~
+  - ~~Trying to make a shiny gadget that helps you manually create
+    crosswalks~~
+      - ~~Figure out what convention or protections to use to write code
+        to the source file~~
+  - Adding examples of code usage in this file
+  - Decide which functions should use NSE and which should not
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-I like to pretend I'm a software developer so I created this little package. It's probably completely unnecessary as I frequently find better versions of the functions I write later. Creating a library is fun though, so maybe you will enjoy it too. I'll show some examples of what the code can do and what my ideas were behind it.
+
+I like to pretend I’m a software developer so I created this little
+package. It’s probably completely unnecessary as I frequently find
+better versions of the functions I write later. Creating a library is
+fun though, so maybe you will enjoy it too. I’ll show some examples of
+what the code can do and what my ideas were behind it.
 
 ### Installation
 
@@ -27,34 +36,49 @@ devtools::install_github('svenhalvorson/svenr')
 library('SvenR')
 ```
 
-If you find any horrendous errors, please let me know at <svenpubmail@gmail.com>
+If you find any horrendous errors, please let me know at
+<svenpubmail@gmail.com>
 
 ### Time Weighted Averages
 
-Time weighted averages are a way of summarizing a numerical variable over many time points. It's often useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
+Time weighted averages are a way of summarizing a numerical variable
+over many time points. It’s often useful when the measurements occur at
+irregular intervals. Basically we’re multiplying the values by how long
+they occur for and then dividing by the total time. It’s very similar to
+taking a Riemann sum.
 
-Here's some example data:
+Here’s some example data:
 
-|  id | val |          t          |
-|:---:|:---:|:-------------------:|
-|  1  |  4  | 2019-01-01 00:00:00 |
-|  1  |  6  | 2019-01-01 00:10:00 |
-|  1  |  8  | 2019-01-01 00:15:00 |
-|  1  |  6  | 2019-01-01 00:45:00 |
-|  2  |  1  | 2019-01-01 00:00:00 |
-|  2  |  NA | 2019-01-01 00:10:00 |
+| id | val |          t          |
+| :-: | :-: | :-----------------: |
+| 1  |  4  | 2019-01-01 00:00:00 |
+| 1  |  6  | 2019-01-01 00:10:00 |
+| 1  |  8  | 2019-01-01 00:15:00 |
+| 1  |  6  | 2019-01-01 00:45:00 |
+| 2  |  1  | 2019-01-01 00:00:00 |
+| 2  | NA  | 2019-01-01 00:10:00 |
 
-The idea here is that have an **id** variable, a **val**ue variable, and a **t**ime variable. We want to summarize the value over time. There are three methods of counting the points that are supported: trapezoids and left/right endpoints.
+The idea here is that have an **id** variable, a **val**ue variable, and
+a **t**ime variable. We want to summarize the value over time. There are
+three methods of counting the points that are supported: trapezoids and
+left/right endpoints.
 
-Visually, the id \#1's values look like this:
+Visually, the id \#1’s values look like
+this:
 
 <img src="man/figures/README-twa_types-1.png" style="display: block; margin: auto;" />
 
-The time weighted average is the area in yellow divided by the total time (45 min). The methods will produce similar results if the number of data points is large but they can be different in a small data set like this.
+The time weighted average is the area in yellow divided by the total
+time (45 min). The methods will produce similar results if the number of
+data points is large but they can be different in a small data set like
+this.
 
-The time weighted average using left endpoints is this:
+The time weighted average using left endpoints is
+this:
 
-![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](https://latex.codecogs.com/png.latex?%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89 "\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89")
+  
+![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](https://latex.codecogs.com/png.latex?%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89
+"\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89")  
 
 Using the function:
 
@@ -68,24 +92,32 @@ twa(df = twa_ex, value_var = val, time_var = t, id, method = 'left')
 #> 2     2  1             0       0       0      2      1     1
 ```
 
-You must supply the data frame to use, identify the time and value variables, list any id variables, and the method. The function computes the time weighted average across each combination of the ids, it tells you the total time used, the largest/smallest intervals (gap), the number of measures received, the number utilized, and the number missing.
+You must supply the data frame to use, identify the time and value
+variables, list any id variables, and the method. The function computes
+the time weighted average across each combination of the ids, it tells
+you the total time used, the largest/smallest intervals (gap), the
+number of measures received, the number utilized, and the number
+missing.
 
 Some notes:
 
--   Records with missing values or times are removed
--   If multiple records occur at the same time, the median is used
--   If only one record is given for a particular combination of ids, it is returned
--   Nonstandard evaluation is used for all arguments
--   You can supply a numeric, non-`POSIXct` time vector
+  - Records with missing values or times are removed
+  - If multiple records occur at the same time, the median is used
+  - If only one record is given for a particular combination of ids, it
+    is returned
+  - Nonstandard evaluation is used column names within the data frame
+  - You can supply a numeric, non-`POSIXct` time vector
 
-I also allowed for computing this summary statistic relative to a reference value. The four `ref_dir` modes are as follows:
+I also allowed for computing this summary statistic relative to a
+reference value. The four `ref_dir` modes are as follows:
 
--   `raw`: no alterations to the data
--   `above` x: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
--   `below` x: The converse of `above`.
--   `about` x: The absolute distance from x is used.
+  - `raw`: no alterations to the data
+  - `above` x: The distance above x is counted instead of the raw
+    values. Values below x are counted as zeroes.
+  - `below` x: The converse of `above`.
+  - `about` x: The absolute distance from x is used.
 
-Here's an example of computing the time weighted average above 5:
+Here’s an example of computing the time weighted average above 5:
 
 ``` r
 
@@ -99,13 +131,19 @@ twa(df = twa_ex, value_var = val, time_var = t, id, ref = 5, ref_dir = 'above', 
 
 <img src="man/figures/README-twa_above-1.png" style="display: block; margin: auto;" />
 
-This can be useful if you have a benchmark value you're trying to compare to. Note that it uses the entire 45 minutes as the denominator even though the first reading was set to zero because it is less than 5.
+This can be useful if you have a benchmark value you’re trying to
+compare to. Note that it uses the entire 45 minutes as the denominator
+even though the first reading was set to zero because it is less than 5.
 
 ### Checking IDs
 
-I often get data where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions that help with these types of problems. They are mostly for interactive use.
+I often get data where I’m not sure if a set of variables uniquely
+identify observations, whether any set does, or if the count of specific
+variables has changed. I created a few functions that help with these
+types of problems. They are mostly for interactive use.
 
-The first is simply a count of unique values for some supplied variables:
+The first is simply a count of unique values for some supplied
+variables:
 
 ``` r
 
@@ -115,7 +153,8 @@ count_ids(mtcars, cyl, carb)
 #> 1   3    6
 ```
 
-We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`. It's pipe-able so you can see what changes a function will cause:
+We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`.
+It’s pipe-able so you can see what changes a function will cause:
 
 ``` r
 
@@ -131,7 +170,10 @@ mtcars %>%
 #> 1   2    6
 ```
 
-I often use this to make sure my merges are doing what I expect. The next function can either check if a combination of columns uniquely specify the observations or try and find such a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
+I often use this to make sure my merges are doing what I expect. The
+next function can either check if a combination of columns uniquely
+specify the observations or try and find such a combination. Do `cyl`
+and `mpg` uniquely specify the cars in `mtcars`?
 
 ``` r
 
@@ -143,7 +185,8 @@ check_id(mtcars, cyl, mpg)
 #>  10 non-unique rows
 ```
 
-You can also use it to try and search for a unique combination of variables by only supplying the data frame:
+You can also use it to try and search for a unique combination of
+variables by only supplying the data frame:
 
 ``` r
 
@@ -160,7 +203,11 @@ check_id(mtcars)
 #>  qsec * carb
 ```
 
-The function starts searching by single columns, then tries pairs of columns, up to the number of columns equal to the value supplied to `max_depth` before giving up. In this case, any of those 9 pairs of variables uniquely specify the observations. If no unique keys are found, the closest combination(s) are listed:
+The function starts searching by single columns, then tries pairs of
+columns, up to the number of columns equal to the value supplied to
+`max_depth` before giving up. In this case, any of those 9 pairs of
+variables uniquely specify the observations. If no unique keys are
+found, the closest combination(s) are listed:
 
 ``` r
 
@@ -175,7 +222,9 @@ check_id(mtcars, max_depth = 1)
 #> Percent unique rows: 56.2%
 ```
 
-Lastly, here's a variation on `duplicated` called `dupes` that I find much more useful for investigating. It flags every observation with at least one other duplicate:
+Lastly, here’s a variation on `duplicated` called `dupes` that I find
+much more useful for investigating. It flags every observation with at
+least one other duplicate:
 
 ``` r
 
@@ -218,11 +267,16 @@ mtcars %>%
 #> 32 4.93     FALSE
 ```
 
-Most of the time when investigating observations with duplicated keys, I want to see the other values that are not duplicated to try and differentiate the observations. This was inspired by the STATA function 'duplicates tag' that makes it easier to look at observations with the same IDs.
+Most of the time when investigating observations with duplicated keys, I
+want to see the other values that are not duplicated to try and
+differentiate the observations. This was inspired by the STATA function
+‘duplicates tag’ that makes it easier to look at observations with the
+same IDs.
 
 ### Missing data
 
-I have a couple of functions that I wrote to help identify missing data. First off, I just kept writing `sum(is.na(x))` so here it is:
+I have a couple of functions that I wrote to help identify missing data.
+First off, I just kept writing `sum(is.na(x))` so here it is:
 
 ``` r
 
@@ -230,7 +284,8 @@ sum_na(x = c(NA, NA, 3, 4, NA, NA))
 #> [1] 4
 ```
 
-I also wrote a summary function, `col_miss`, for a data set. It computes the percent of observations that are missing for each column:
+I also wrote a summary function, `col_miss`, for a data set. It computes
+the percent of observations that are missing for each column:
 
 ``` r
 
@@ -246,17 +301,16 @@ col_miss(dat1)
 You can tell it to consider empty strings as missing:
 
 ``` r
-
-dat2 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', ''))
-
-col_miss(dat2, empty_string = TRUE)
-#> [1] "Percent missing by column for dat2"
+col_miss(dat1, empty_string = TRUE)
+#> [1] "Percent missing by column for dat1"
 #>       x       y 
 #> "66.7%" "50.0%"
 ```
 
-I'm not sure about you but at my old job I always received excel sheets with vertically merged cells. When you load these up, they have a bunch of blank entries that should be repititions. Here's a function that can deal with that:
+I’m not sure about you but at my old job I always received excel sheets
+with vertically merged cells. When you load these up, they have a bunch
+of blank entries that should be repititions. Here’s a function that can
+deal with that:
 
 ``` r
 
@@ -272,18 +326,25 @@ fill_down(NM, reverse = TRUE)
 #> [8] "Roswell"
 ```
 
-I later found out that the function `tidyr::fill` does almost the same thing. `fill_down` does two things differently though:
+I later found out that the function `tidyr::fill` does almost the same
+thing. `fill_down` does two things differently though:
 
--   It can treat blank strings as missing
--   It can operate on vectors outside of data frames
+  - It can treat blank strings as missing
+  - It can operate on vectors outside of data frames
 
-For these reasons I've kept it around but it's not necessary most of the time.
+For these reasons I’ve kept it around but it’s not necessary most of the
+time.
 
 ### Creating Crosswalks
 
-Frequently I encounter text data that I want to bin. This often comes about when I have hand written records or data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions but I often find these unreliable if the underlying data changes. Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this.
+Frequently I encounter text data that I want to bin. This often comes
+about when I have hand written records or data with very slight
+variations on a theme. Sometimes it’s easy enough to do this with
+regular expressions but I often find these unreliable if the underlying
+data changes. Sometimes it’s nicer to just make a crosswalk manually so
+I created a shiny gadget to do exactly this.
 
-Here's an example data set of hospital visits to different departments:
+Here’s an example data set of hospital visits to different departments:
 
 ``` r
 med_table = tibble::tibble(dept = c('pulmonary',
@@ -310,7 +371,8 @@ med_table
 #> 6 pulm      office
 ```
 
-To use this tool, call the `crosswalk` function on a data frame and supply the columns you wish to cross from:
+To use this tool, call the `crosswalk` function on a data frame and
+supply the columns you wish to cross from:
 
 ``` r
 
@@ -321,11 +383,13 @@ This will create a table in your Rstudio viewer:
 
 ![](man/figures/README-crosswalk.PNG)
 
-The last column will always be whatever the first one you enter prefixed with 'new\_'. The last column is editable:
+The last column will always be whatever the first one you enter prefixed
+with ‘new\_’. The last column is editable:
 
 ![](man/figures/README-crosswalk2.PNG)
 
-Then when you hit accept, it will generate the code that creates your crosswalk:
+Then when you hit accept, it will generate the code that creates your
+crosswalk:
 
 ``` r
 
@@ -340,7 +404,7 @@ med_table_cross
 #> 5      pulm  office  pulm_visit
 ```
 
-Then you'll usually join it onto the original:
+Then you’ll usually join it onto the original:
 
 ``` r
 med_table %>% 
@@ -357,11 +421,22 @@ med_table %>%
 #> 6 pulm      office  pulm_visit
 ```
 
-I created this using the `rstudioapi` so it actually replaces the `crosswalk` command in the rstudio source editor with the result. The reason for this is that this way the `data.frame` can just be implanted into a script and other users will not need SvenR or the clicking and typing that created the crosswalk.
+I created this using the `rstudioapi` so it actually replaces the
+`crosswalk` command in the rstudio source editor with the result. The
+reason for this is that this way the `data.frame` can just be implanted
+into a script and other users will not need SvenR or the clicking and
+typing that created the crosswalk.
 
-I did create some safegaurds to try and prevent people (mostly me) from deleting their own code so it will not execute if you have multiple lines highlighted when you run `crosswalk` or the text of that line does not contain `crosswalk(.+)`.
+I did create some safegaurds to try and prevent people (mostly me) from
+deleting their own code so it will not execute if you have multiple
+lines highlighted when you run `crosswalk` or the text of that line does
+not contain `crosswalk(.+)`.
 
 A few more notes:
 
--   Notice that `med_table` had 6 observations but the cross has 5. This is because `crosswalk` only takes distinct combinations of the variables supplied.
--   If you want to get cominations of variables not present in the data set, you can set `all_combos = TRUE` to use `expand` instead of `distinct`
+  - Notice that `med_table` had 6 observations but the cross has 5. This
+    is because `crosswalk` only takes distinct combinations of the
+    variables supplied.
+  - If you want to get cominations of variables not present in the data
+    set, you can set `all_combos = TRUE` to use `expand` instead of
+    `distinct`
