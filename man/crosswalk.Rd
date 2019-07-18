@@ -25,11 +25,9 @@ large sets of regular expressions sometimes works but often it's faster just
 to make a crosswalk yourself. \code{crosswalk} creates the unique combination
 of one or more columns within a data frame, allows the user to edit the 'new
 values' and returns code to produce the crosswalk.
-}
-\examples{
-iris \%>\%
-  mutate(species_chr = Species) \%>\%
-  crosswalk(species_chr)
+
+You must highlight a single line within an R studio script for this to execute. This
+is intended to help you not delete your code.
 }
 \author{
 Sven Halvorson
