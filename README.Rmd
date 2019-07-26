@@ -289,7 +289,7 @@ up, they have a bunch of blank entries that should be repititions. Here's a func
 
 ```{r fill_down}
 
-NM = c(NA, 'Ruidosa', NA, '', NA, 'Corona', NA, 'Roswell')
+NM = c(NA, 'Ruidoso', NA, '', NA, 'Corona', NA, 'Roswell')
 fill_down(NM)
 fill_down(NM, empty_string = TRUE)
 fill_down(NM, reverse = TRUE)
