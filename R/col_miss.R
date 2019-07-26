@@ -16,6 +16,10 @@
 #' @export
 col_miss = function(df, empty_string = FALSE){
 
+  # Capture data frame name:
+  df_name = dplyr::enquo(df) %>%
+    (dplyr::quo_name)
+
   # Always use protection:
   if(!is.data.frame(df) |
      nrow(df) == 0){
@@ -42,8 +46,8 @@ col_miss = function(df, empty_string = FALSE){
       round_per(mean(is.na(x)))
     }
   }
+  print(paste('Percent missing by column for', df_name))
+  vapply(X = df, FUN = function(x){paste0(check_na(x),'%') }, FUN.VALUE = character(1))
 
-  vapply(X = df, FUN = check_na, FUN.VALUE = character(1)) %>%
-    paste0('%')
 
 }

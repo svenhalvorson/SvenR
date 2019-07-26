@@ -4,13 +4,14 @@ output:
   github_document:
     toc: true
     toc_depth: 3
+    pandoc_args: --webtex
 ---
 
 **IN PROGRESS (2019-06-17) Stuff I'm working on right now:**
 
 * ~~Working on dependencies. I don't want the package to attach anything when loaded so I have to go through and add dplyr:: to things~~
 * ~~Trying to make a shiny gadget that helps you manually create crosswalks~~
-    + Figure out what convention or protections to use to write code to the source file
+    + ~~Figure out what convention or protections to use to write code to the source file~~
 * Adding examples of code usage in this file
 * Decide which functions should use NSE and which should not
 
@@ -18,12 +19,14 @@ output:
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
+#
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
- # out.width = "100%",
+  #out.width = "100%",
   fig.pos = 'c'
+  #fig.align = "center"
 )
 ```
 
@@ -124,12 +127,12 @@ ggplot() +
 ```
 
 The time weighted average is the area in yellow divided by the total time (45 min).
-The methods will not compute very different totals if the number of data points is large
-but they can look different in a small data set like this.
+The methods will produce similar results if the number of data points is large
+but they can be different in a small data set like this.
 
 The time weighted average using left endpoints is this:
 
-<!-- $$\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89$$ -->
+\[\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89\]
 
 Using the function:
 
@@ -150,16 +153,16 @@ Some notes:
 * Records with missing values or times are removed
 * If multiple records occur at the same time, the median is used
 * If only one record is given for a particular combination of ids, it is returned
-* Nonstandard evaluation is used for all arguments
+* Nonstandard evaluation is used column names within the data frame
 * You can supply a numeric, non-`POSIXct` time vector
 
 I also allowed for computing this summary statistic relative to a reference value.
 The four `ref_dir` modes are as follows:
 
-* **Raw**: no alterations to the data
-* **Above x**: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
-* **Below x**: The converse of above.
-* **About x**: The absolute distance from x is used.
+* `raw`: no alterations to the data
+* `above` x: The distance above x is counted instead of the raw values. Values below x are counted as zeroes.
+* `below` x: The converse of `above`.
+* `about` x: The absolute distance from x is used.
 
 Here's an example of computing the time weighted average above 5:
 ```{r twa_execute2}
@@ -187,7 +190,7 @@ ggplot() +
 
 ```
 
-This is sometimes useful if you have a benchmark value you're trying to compare to. Note that
+This can be useful if you have a benchmark value you're trying to compare to. Note that
 it uses the entire 45 minutes as the denominator even though the first reading was set to zero because
 it is less than 5.
 
@@ -225,7 +228,7 @@ check_id(mtcars, cyl, mpg)
 
 ```
 
-It will tell you if the combination you gave determines a specific row. You can also use it
+You can also use it
 to try and search for a unique combination of variables by only supplying the data frame:
 ```{r check_id_ex2}
 
@@ -270,17 +273,20 @@ sum_na(x = c(NA, NA, 3, 4, NA, NA))
 
 ```
 
-I also wrote a summary function, `col_miss`, for a data set. You can tell it to consider empty strings as missing:
+I also wrote a summary function, `col_miss`, for a data set. It computes the percent of observations that are missing for each column:
 
-```{r col_miss}
+```{r col_miss1}
 
-tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
-  col_miss
+dat1 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
+       y = c(NA, 'a', 'b', 'c', '', ''))
 
-tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', '')) %>% 
-  col_miss(empty_string = TRUE)
+col_miss(dat1)
+```
+
+You can tell it to consider empty strings as missing:
+
+```{r col_miss2}
+col_miss(dat1, empty_string = TRUE)
 
 ```
 
@@ -301,4 +307,70 @@ though:
 * It can treat blank strings as missing
 * It can operate on vectors outside of data frames
 
-For these reasons, I've kept it around but it's necessary most of the time.
+For these reasons I've kept it around but it's not necessary most of the time.
+
+### Creating Crosswalks
+
+Frequently I encounter text data that I want to bin. This often comes about when I have hand written records or data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions but I often find these unreliable if the underlying data changes.
+Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this.
+
+Here's an example data set of hospital visits to different departments:
+
+```{r cross_table}
+med_table = tibble::tibble(dept = c('pulmonary',
+                            'pulmonary',
+                            'heart',
+                            'cardio',
+                            'cardio',
+                            'pulm'),
+                   visit = c('surgery',
+                             'surg',
+                             'visit',
+                             'surgery',
+                             'surgery',
+                             'office'))
+med_table
+```
+
+To use this tool, call the `crosswalk` function on a data frame and supply the columns you wish to cross from:
+
+```{r cross_example, message = FALSE, eval = FALSE, echo = TRUE}
+
+crosswalk(med_table, dept, visit)
+
+```
+
+This will create a table in your Rstudio viewer:
+
+![](man/figures/README-crosswalk.PNG)
+
+The last column will always be whatever the first one you enter prefixed with 'new_'. The last column is editable:
+
+![](man/figures/README-crosswalk2.PNG)
+
+Then when you hit accept, it will generate the code that creates your crosswalk:
+
+```{r cross_done}
+
+med_table_cross = structure(list(dept = c("pulmonary", "pulmonary", "heart", "cardio", "pulm"), visit = c("surgery", "surg", "visit", "surgery", "office"), new_dept = c("pulm_surg", "pulm_surg", "heart_visit", "heart_surg", "pulm_visit")), row.names = c(NA, -5L), class = "data.frame")
+
+med_table_cross
+
+```
+
+Then you'll usually join it onto the original:
+
+```{r cross_done2}
+med_table %>% 
+  dplyr::left_join(med_table_cross)
+
+```
+
+I created this using the `rstudioapi` so it actually replaces the `crosswalk` command in the rstudio source editor with the result. The reason for this is that this way the `data.frame` can just be implanted into a script and other users will not need SvenR or the clicking and typing that created the crosswalk.
+
+I did create some safegaurds to try and prevent people (mostly me) from deleting their own code so it will not execute if you have multiple lines highlighted when you run `crosswalk` or the text of that line does not contain `crosswalk(.+)`.
+
+A few more notes:
+
+* Notice that `med_table` had 6 observations but the cross has 5. This is because `crosswalk` only takes distinct combinations of the variables supplied.
+* If you want to get cominations of variables not present in the data set, you can set `all_combos = TRUE` to use `expand` instead of `distinct`
