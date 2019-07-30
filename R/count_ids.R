@@ -1,6 +1,6 @@
 #' Count IDs
 #' @description Computes \code{n_distinct} on specified columns and gives row count.
-#' @note Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied.
+#' @note Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied. Ungroups data frames with a warning.
 #' @param df A data frame
 #' @param ... Unquoted column names in \code{df}
 #' @return \code{df}, intended for side effect use.
@@ -23,6 +23,12 @@ count_ids = function(df, ...){
   }
 
   print(paste(nrow(df), "observations"))
+
+  if(is.grouped_df(df)){
+    warning('df is grouped, ungrouping...')
+    df = df %>%
+      ungroup
+  }
 
   # unique ids
   id_counts = df %>%

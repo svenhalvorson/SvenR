@@ -18,7 +18,7 @@ count_ids(df, ...)
 Computes \code{n_distinct} on specified columns and gives row count.
 }
 \note{
-Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied.
+Defaults to op_sys, visit_sys, and patient_sys if \code{...} is not supplied. Ungroups data frames with a warning.
 }
 \examples{
 df = tibble(op_sys = 1:5,
