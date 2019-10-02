@@ -46,7 +46,7 @@ col_miss = function(df, empty_string = FALSE){
       round_per(mean(is.na(x)))
     }
   }
-  print(paste('Percent missing by column for', df_name))
+  cat(paste('Percent missing by column for', df_name,':\n\n'))
   vapply(X = df, FUN = function(x){paste0(check_na(x),'%') }, FUN.VALUE = character(1))
 
 
