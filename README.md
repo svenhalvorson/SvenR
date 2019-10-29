@@ -290,10 +290,10 @@ the percent of observations that are missing for each column:
 ``` r
 
 dat1 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-       y = c(NA, 'a', 'b', 'c', '', ''))
+                      y = c(NA, 'a', 'b', 'c', '', ''))
 
 col_miss(dat1)
-#> [1] "Percent missing by column for dat1"
+#> Percent missing by column for dat1 :
 #>       x       y 
 #> "66.7%" "16.7%"
 ```
@@ -302,7 +302,7 @@ You can tell it to consider empty strings as missing:
 
 ``` r
 col_miss(dat1, empty_string = TRUE)
-#> [1] "Percent missing by column for dat1"
+#> Percent missing by column for dat1 :
 #>       x       y 
 #> "66.7%" "50.0%"
 ```
