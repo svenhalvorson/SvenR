@@ -63,7 +63,7 @@ a **t**ime variable. We want to summarize the value over time. There are
 three methods of counting the points that are supported: trapezoids and
 left/right endpoints.
 
-Visually, the id \#1’s values look like
+Visually, id \#1’s values look like
 this:
 
 <img src="man/figures/README-twa_types-1.png" style="display: block; margin: auto;" />

@@ -79,7 +79,7 @@ and a **t**ime variable. We want to summarize the value over time.
 There are three methods of counting the points that are supported:
 trapezoids and left/right endpoints.
 
-Visually, the id #1's values look like this:
+Visually, id #1's values look like this:
 
 ```{r twa_types, echo = FALSE, fig.align='center', fig.align='center', fig.width=7, fig.height=3.5}
 

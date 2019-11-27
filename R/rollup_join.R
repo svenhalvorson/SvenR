@@ -3,9 +3,9 @@
 #' The idea for this function is that I frequently assemble many data frames
 #' and wish to combine them at the end of the script for export. This helps
 #' make sure you preserve the uniqueness of the ids and tells you where the
-#' problem is ocurring.
+#' problem is occurring.
 #' @param dfs A named list of \code{data.frames}
-#' @param ... The keys to join on
+#' @param ... The keys to join on, unquoted
 #' @param how The merging style. One of \code{c('left', 'right', 'inner', 'full')}
 #' @author Sven Halvorson
 #' @examples
@@ -19,10 +19,7 @@
 #' rollup_join(mget(paste0('d', 1:2)), id)
 #' rollup_join(mget(paste0('d', 1:3)), id)
 #' @note It's easy to get a named list if you use mget
-#' @export
 
-
-# now the function to get the whole thing together
 rollup_join = function(dfs, ..., how = 'left'){
 
   # get some stuff here to help with the tidy eval
@@ -34,15 +31,17 @@ rollup_join = function(dfs, ..., how = 'left'){
   # Saftey first:
   if(!all(is.list(dfs),
          length(dfs) > 1,
-         all(lapply(dfs), is.data.frame),
-         length(names(dfs)) == nrow(dfs))){
+         all(lapply(dfs, is.data.frame)),
+         length(names(dfs)) == length(dfs))){
     stop('dfs must be a named list of data frames')
   }
   if(!all(length(how) == 1,
           how %in% c('left', 'right', 'inner', 'full'))){
     stop("how must be in c('left', 'right', 'inner', 'full')")
   }
-
+  # not sure if I should do anything about the keys. I kinda
+  # think the messages will be clear enough about why the
+  # joins aren't happening.
 
   # Helper to check uniqueness:
   check_distinct = function(df){
@@ -72,9 +71,9 @@ rollup_join = function(dfs, ..., how = 'left'){
 
 
   purrr::reduce(.x = dfs,
-               .f = merge_distinct,
-               how = how,
-               right_name = right_names)
+                .f = merge_distinct,
+                how = how,
+                right_name = right_names)
 }
 
 
