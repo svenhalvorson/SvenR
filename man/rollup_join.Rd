@@ -9,7 +9,7 @@ rollup_join(dfs, ..., how = "left")
 \arguments{
 \item{dfs}{A named list of \code{data.frames}}
 
-\item{...}{The keys to join on}
+\item{...}{The keys to join on, unquoted}
 
 \item{how}{The merging style. One of \code{c('left', 'right', 'inner', 'full')}}
 }
@@ -18,7 +18,7 @@ Join a list of data sets and check for preserving unique ids.
 The idea for this function is that I frequently assemble many data frames
 and wish to combine them at the end of the script for export. This helps
 make sure you preserve the uniqueness of the ids and tells you where the
-problem is ocurring.
+problem is occurring.
 }
 \note{
 It's easy to get a named list if you use mget
