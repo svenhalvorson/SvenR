@@ -1,22 +1,63 @@
 #' Format CIs
 #' @description Round and format confidence intervals
-#' @param estimate, lower, upper The point estimate, lower bound, and upper bound.
+#' @param point, lower, upper The point estimate, lower bound, and upper bound.
 #' @param digits A vector of digits to begin rounding at.
 #' @param max_its The maximum number of additiona digits to give
 #' @param null_value A vector of null values to be compared to. If
 
-#' @details
+#' @details H
 #' @author Sven Halvorson
 #' @examples
 #' @export fmt_ci
 
-round_ci =  function(estimate, lower, upper,
-                     digits = 2, max_its = 4,
-                     null_value){
+fmt_ci = function(
+  point,
+  lower,
+  upper,
+  null_value,
+  digits,
+  max_its = 4
+){
+
+  # First thing is to do the checks
+
+  # All CI arguments must be numeric:
+  num_vec = function(x){
+    is.numeric(x) & is.vector(x)
+  }
+  if(
+    any(
+      !num_vec(point),
+      !num_vec(lower),
+      !num_vec(upper)
+    )
+  ){
+    stop('point, lower, and upper must be numeric')
+  }
+
+  cis = Map(
+    .f = round_ci,
+    point = point,
+    lower = lower,
+    upper = upper,
+    digits = digits,
+    null_value = null_value
+
+  )
+
+}
+
+
+round_ci =  function(point, lower, upper,
+                     digits, null_value){
 
   # Are we testing against a null value?
   has_null = !missing(null_value) & !is.na(null_value)
 
+  # Are we guessing the digit range?
+  if(missing(digits) | is.na(digits)){
+    digits = choose_digits(lower, upper)
+  }
 
   # Flag for when the loop is complete and we're off to the races!
   done = 0
@@ -30,16 +71,11 @@ round_ci =  function(estimate, lower, upper,
     }
 
     vals = vapply(
-      X = c(estimate, lower, ub),
+      X = c(point, lower, ub),
       FUN = round,
       FUN.VALUE = numeric(1),
       digits = digits
       )
-
-    # If we don't want to adjust any further:
-    if(strict){
-      done = 1
-    }
 
     # Check if they're all different
     if(length(unique(vals)) < length(vals)){
@@ -65,7 +101,11 @@ round_ci =  function(estimate, lower, upper,
 
   }
 
-  vals
+  tibble(
+    point = vals[1],
+    lower = vals[2],
+    upper = vals[3]
+  )
 
 }
 
