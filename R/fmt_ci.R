@@ -14,9 +14,10 @@ fmt_ci = function(
   point,
   lower,
   upper,
-  null_value,
-  digits,
-  max_its = 4
+  null_value = NA,
+  digits = NA,
+  max_its = 4,
+  unacceptables = NA
 ){
 
   # First thing is to do the checks
@@ -36,27 +37,50 @@ fmt_ci = function(
   }
 
   cis = Map(
-    .f = round_ci,
+    f = round_ci,
     point = point,
     lower = lower,
     upper = upper,
     digits = digits,
-    null_value = null_value
+    null_value = null_value,
+    max_its = max_its,
+    unacceptables = unacceptables
 
   )
+  cis %>%
+    dplyr::bind_rows()
 
 }
 
 
 round_ci =  function(point, lower, upper,
-                     digits, null_value){
+                     digits, null_value,
+                     max_its = 4, unacceptables){
 
   # Are we testing against a null value?
-  has_null = !missing(null_value) & !is.na(null_value)
+  if(!missing(null_value)){
+    if(!is.na(null_value)){
+      has_null = TRUE
+    }
+  } else{
+    has_null = FALSE
+  }
 
   # Are we guessing the digit range?
-  if(missing(digits) | is.na(digits)){
+  if(missing(digits)){
     digits = choose_digits(lower, upper)
+  }
+  if(is.na(digits)){
+    digits = choose_digits(lower, upper)
+  }
+
+  # Are we excluding certain values?
+  if(!missing(unacceptables)){
+    if(!is.na(unacceptables)){
+      has_unacceptables = TRUE
+    }
+  } else{
+    has_unacceptables = FALSE
   }
 
   # Flag for when the loop is complete and we're off to the races!
@@ -71,11 +95,11 @@ round_ci =  function(point, lower, upper,
     }
 
     vals = vapply(
-      X = c(point, lower, ub),
+      X = c(point, lower, upper),
       FUN = round,
       FUN.VALUE = numeric(1),
       digits = digits
-      )
+    )
 
     # Check if they're all different
     if(length(unique(vals)) < length(vals)){
@@ -87,25 +111,40 @@ round_ci =  function(point, lower, upper,
     if(has_null){
       if(
         any(
-          vars[2] == null_value,
-          vars[3] == null_value,
-          (lower - null_value < 0) != (vars[2] - null_value < 0),
-          (upper - null_value < 0) != (vars[3] - null_value < 0)
+          vals[2] == null_value,
+          vals[3] == null_value,
+          (lower - null_value < 0) != (vals[2] - null_value < 0),
+          (upper - null_value < 0) != (vals[3] - null_value < 0)
         )
       ){
         digits = digits + 1
         next()
       }
     }
+
+    # Check if the unacceptable values are in the values:
+    if(has_unacceptables){
+      if(sum(unacceptables %in% vals) > 1){
+        digits = digits + 1
+        next()
+      }
+    }
+
     done = 1
 
   }
+
+  # Format them to strings:
+  vals = format(vals, nsmall = digits, scientific = FALSE)
 
   tibble(
     point = vals[1],
     lower = vals[2],
     upper = vals[3]
-  )
+  ) %>%
+    mutate(
+      CI = paste0(point, ' (', lower, ', ', upper, ')')
+    )
 
 }
 
@@ -124,7 +163,13 @@ choose_digits = function(lower, upper){
 
   # now we go through some cases:
   if(logdiff < 0){
-    ceiling(-1*logdiff)
+    max(
+      c(
+        ceiling(-1*logdiff),
+        2
+      )
+    )
+
   }
   else if(logdiff < 1){
     1
@@ -134,17 +179,3 @@ choose_digits = function(lower, upper){
   }
 
 }
-x1 = 100.203
-x2 = 100.210
-
-ceiling(-1*log10(x2-x1))
-
-y2 = 100.203
-y1 = 88.429
-
-ceiling(-1*log10(y2-y1))
-
-z2 = 100.203
-z1 = 98.429
-
-ceiling(-1*log10(z2-z1))
