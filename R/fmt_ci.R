@@ -124,7 +124,7 @@ round_ci =  function(point, lower, upper,
 
     # Check if the unacceptable values are in the values:
     if(has_unacceptables){
-      if(sum(unacceptables %in% vals) > 1){
+      if(sum(unacceptables %in% vals) > 0){
         digits = digits + 1
         next()
       }
