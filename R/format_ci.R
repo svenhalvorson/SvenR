@@ -1,16 +1,21 @@
-#' Format CIs
-#' @description Round and format confidence intervals
+#' Format Confidence Intervals
+#' @description Round and format confidence intervals for presentation.
 #' @param point, lower, upper The point estimate, lower bound, and upper bound.
 #' @param digits A vector of digits to begin rounding at.
 #' @param max_its The maximum number of additiona digits to give
-#' @param null_value A vector of null values to be compared to. If
-
-#' @details H
+#' @param null_value A vector of null values to be compared to.
+#' @details The goal of this function is to round confidence intervals
+#' for presentation. You can supply digits to round to or let the function guess.
+#' It will try to improve the CI until it hits the \code{max_its}. The function
+#' attempts to have the point estimate and each end of the CI as different numbers.
+#' If you supply a \code{null_value} it will try not to use that as either endpoint
+#' and keep the null value on the same side of the CI as the unformatted value is.
+#' If \code{unacceptables} is supplied, these values will not be allowed as
+#' endpoints for the CI.
 #' @author Sven Halvorson
-#' @examples
-#' @export fmt_ci
+#' @export format_ci
 
-fmt_ci = function(
+format_ci = function(
   point,
   lower,
   upper,

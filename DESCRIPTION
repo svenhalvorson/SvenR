@@ -3,6 +3,7 @@ Type: Package
 Title: Tools for exploration
 Version: 0.1.0
 Author: Sven Halvorson
+Maintainer: Sven Halvorson <svenpubmail@gmail.com>
 Description: A collection of loosely related functions that I use for data cleaning and experiments
 License: None
 Encoding: UTF-8
