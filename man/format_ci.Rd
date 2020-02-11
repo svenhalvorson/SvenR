@@ -4,8 +4,8 @@
 \alias{format_ci}
 \title{Format Confidence Intervals}
 \usage{
-format_ci(point, lower, upper, null_value = NA, digits = NA,
-  max_its = 4, unacceptables = NA)
+format_ci(point, lower, upper, null_value = NA_real_,
+  digits = NA_real_, max_its = 4, unacceptables = NA_real_)
 }
 \arguments{
 \item{point, }{lower, upper The point estimate, lower bound, and upper bound.}
@@ -28,6 +28,38 @@ If you supply a \code{null_value} it will try not to use that as either endpoint
 and keep the null value on the same side of the CI as the unformatted value is.
 If \code{unacceptables} is supplied, these values will not be allowed as
 endpoints for the CI.
+}
+\examples{
+# Set up a dataset for a logistic regression model:
+df = nycflights13::flights \%>\%
+  mutate(on_time = dep_delay <= 0)
+
+analysis_table = glm(
+  formula = on_time ~ month + sched_dep_time + origin + air_time,
+  data = df,
+  family = binomial
+) \%>\%
+  broom::tidy(
+    conf.int = TRUE
+  )
+
+cis = format_ci(
+  point = analysis_table['estimate'],
+  lower = analysis_table['conf.low'],
+  upper = analysis_table['conf.high'],
+  null_value = 1,
+  unacceptables = 0
+)
+
+analysis_table \%>\%
+  select(
+    term,
+    estimate,
+    conf.low,
+    conf.high
+  ) \%>\%
+  bind_cols(cis)
+
 }
 \author{
 Sven Halvorson

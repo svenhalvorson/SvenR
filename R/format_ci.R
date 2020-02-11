@@ -12,6 +12,37 @@
 #' and keep the null value on the same side of the CI as the unformatted value is.
 #' If \code{unacceptables} is supplied, these values will not be allowed as
 #' endpoints for the CI.
+#' @examples
+#' # Set up a dataset for a logistic regression model:
+#' df = nycflights13::flights %>%
+#'   mutate(on_time = dep_delay <= 0)
+#'
+#' analysis_table = glm(
+#'   formula = on_time ~ month + sched_dep_time + origin + air_time,
+#'   data = df,
+#'   family = binomial
+#' ) %>%
+#'   broom::tidy(
+#'     conf.int = TRUE
+#'   )
+#'
+#' cis = format_ci(
+#'   point = analysis_table['estimate'],
+#'   lower = analysis_table['conf.low'],
+#'   upper = analysis_table['conf.high'],
+#'   null_value = 1,
+#'   unacceptables = 0
+#' )
+#'
+#' analysis_table %>%
+#'   select(
+#'     term,
+#'     estimate,
+#'     conf.low,
+#'     conf.high
+#'   ) %>%
+#'   bind_cols(cis)
+#'
 #' @author Sven Halvorson
 #' @export format_ci
 
@@ -19,27 +50,57 @@ format_ci = function(
   point,
   lower,
   upper,
-  null_value = NA,
-  digits = NA,
+  null_value = NA_real_,
+  digits = NA_real_,
   max_its = 4,
-  unacceptables = NA
+  unacceptables = NA_real_
 ){
 
   # First thing is to do the checks
+  if(
+    any(
+      missing(point),
+      missing(lower),
+      missing(upper)
+    )
+  ){
+    stop('point, lower, and upper must all be supplied')
+  }
+  # All CI arguments must be numeric atomics:
+  point = unlist(point)
+  lower = unlist(lower)
+  upper = unlist(upper)
 
-  # All CI arguments must be numeric:
   num_vec = function(x){
-    is.numeric(x) & is.vector(x)
+    is.numeric(x) & is.vector(x) & is.atomic(x)
   }
   if(
     any(
       !num_vec(point),
       !num_vec(lower),
-      !num_vec(upper)
+      !num_vec(upper),
+      length(point) != length(upper),
+      length(point) != length(lower),
+      length(upper) != length(lower)
     )
   ){
-    stop('point, lower, and upper must be numeric')
+    stop('point, lower, and upper must be numeric vectors of the same length')
   }
+
+  # Check the other arguments:
+  check_arg = function(x){
+
+    x = get(x, envir = parent.frame())
+    max(
+      c(
+        missing(x),
+        num_vec(x) & length(x) %in% c(1, length(point)),
+        is.na(x) & length(x) == 1
+      )
+    )
+
+  }
+
 
   cis = Map(
     f = round_ci,
@@ -53,7 +114,10 @@ format_ci = function(
 
   )
   cis %>%
-    dplyr::bind_rows()
+    dplyr::bind_rows() %>%
+    dplyr::mutate(
+      CI = paste0(point, ' (', lower, ', ', upper, ')')
+    )
 
 }
 
@@ -146,10 +210,7 @@ round_ci =  function(point, lower, upper,
     point = vals[1],
     lower = vals[2],
     upper = vals[3]
-  ) %>%
-    mutate(
-      CI = paste0(point, ' (', lower, ', ', upper, ')')
-    )
+  )
 
 }
 
@@ -184,3 +245,5 @@ choose_digits = function(lower, upper){
   }
 
 }
+
+
