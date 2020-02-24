@@ -2,30 +2,19 @@ SvenR
 ================
 
   - [Installation](#installation)
+  - [Formatting numbers](#formatting-numbers)
   - [Time Weighted Averages](#time-weighted-averages)
   - [Checking IDs](#checking-ids)
   - [Missing data](#missing-data)
   - [Creating Crosswalks](#creating-crosswalks)
 
-**IN PROGRESS (2019-06-17) Stuff I’m working on right now:**
-
-  - ~~Working on dependencies. I don’t want the package to attach
-    anything when loaded so I have to go through and add dplyr:: to
-    things~~
-  - ~~Trying to make a shiny gadget that helps you manually create
-    crosswalks~~
-      - ~~Figure out what convention or protections to use to write code
-        to the source file~~
-  - Adding examples of code usage in this file
-  - Decide which functions should use NSE and which should not
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 I like to pretend I’m a software developer so I created this little
-package. It’s probably completely unnecessary as I frequently find
-better versions of the functions I write later. Creating a library is
-fun though, so maybe you will enjoy it too. I’ll show some examples of
-what the code can do and what my ideas were behind it.
+package. It’s not a super fancy or cohesive group of functions but I do
+use these (mostly interactively) in the course of my work. In any case
+creating a library is fun so maybe you will enjoy it too. I’ll show some
+examples of what the code can do and what the ideas behind it are.
 
 ### Installation
 
@@ -36,8 +25,116 @@ devtools::install_github('svenhalvorson/svenr')
 library('SvenR')
 ```
 
-If you find any horrendous errors, please let me know at
+Some of the functions I’ve tested quite a bit and others less so. If you
+find any horrendous errors, please let me know at
 <svenpubmail@gmail.com>
+
+### Formatting numbers
+
+If I ever get the infamous interview question ‘what is your biggest
+weakness?’ I have an answer prepped: low tolerance for tedium. The idea
+of manually punching in lots of numbers to report is not only
+unappealing, it opens the door to unreproducible research. As a result,
+I created a function to round confidence intervals and one to make nice
+IQRs. I also have one for rounding cohort tables (produced by the
+**tableone** package) that I might clean up and post later.
+
+The first function, **format\_ci** tries to make your confidence
+intervals cleaner and easier to read. It takes in three vectors (point
+estimate, upper/lower bounds) and starts and iterative rounding process.
+Here we’ll show an example with the **nycflights** dataset and **broom**
+
+``` r
+
+# Make a binary variable of if the plane left on time:
+flights2 = nycflights13::flights %>% 
+  mutate(
+    on_time = as.numeric(dep_delay > 0)
+  )
+
+# now make a logistic model of this with a few factors
+on_time_model = glm(
+  on_time ~ dep_time + origin + distance,
+  family = binomial, 
+  data = flights2
+)
+
+# And here's the table of unformatted confidence intervals:
+on_time_est = on_time_model %>% 
+  broom::tidy(
+    conf.int = TRUE,
+    exponentiate = TRUE
+  ) %>% 
+  select(
+    term,
+    estimate,
+    conf.low,
+    conf.high
+  )
+
+on_time_est %>%
+  kable(
+    align = 'c',
+    format = 'markdown'
+  )
+```
+
+|    term     | estimate  | conf.low  | conf.high |
+| :---------: | :-------: | :-------: | :-------: |
+| (Intercept) | 0.1310076 | 0.1274532 | 0.1346556 |
+|  dep\_time  | 1.0012690 | 1.0012532 | 1.0012848 |
+|  originJFK  | 0.6742601 | 0.6624013 | 0.6863258 |
+|  originLGA  | 0.6275463 | 0.6161296 | 0.6391691 |
+|  distance   | 1.0001032 | 1.0000929 | 1.0001134 |
+
+There are a number of problems you can come across when trying to round
+the confidence intervals. One of which is that the (likely) null value
+for this model is 1 but the way broom displays the point & 95% CI for
+departure time as 1 (1, 1) which is unhelpful. You can’t tell which side
+of the null value some of these estimates are. This function can be set
+with a null value and other unacceptable values which will not be
+allowed as endpoints of the CI:
+
+``` r
+
+with(
+  on_time_est,
+  format_ci(
+    point = estimate,
+    lower = conf.low,
+    upper = conf.high,
+    null_value = 1
+  )
+) %>% 
+  kable(
+    align = 'c',
+    format = 'markdown'
+  )
+```
+
+|  point  |  lower  |  upper  |             CI             |
+| :-----: | :-----: | :-----: | :------------------------: |
+|  0.131  |  0.127  |  0.135  |    0.131 (0.127, 0.135)    |
+| 1.00127 | 1.00125 | 1.00128 | 1.00127 (1.00125, 1.00128) |
+|  0.67   |  0.66   |  0.69   |     0.67 (0.66, 0.69)      |
+|  0.63   |  0.62   |  0.64   |     0.63 (0.62, 0.64)      |
+| 1.00010 | 1.00009 | 1.00011 | 1.00010 (1.00009, 1.00011) |
+
+You can tell it how many digits to round to but it will guess if not
+supplied. It has a maximum number of iterations to try before giving up
+so keep that in mind.
+
+Another formatting function I wrote is **pretty\_iqr** which makes a
+nice version of a median \[Q1, Q3\] for a vector:
+
+``` r
+
+pretty_iqr(
+  x = flights2$dep_delay,
+  digits = 1
+)
+#> [1] "-2.0 [-5.0,11.0]"
+```
 
 ### Time Weighted Averages
 
@@ -436,7 +533,6 @@ A few more notes:
 
   - Notice that `med_table` had 6 observations but the cross has 5. This
     is because `crosswalk` only takes distinct combinations of the
-    variables supplied.
-  - If you want to get cominations of variables not present in the data
-    set, you can set `all_combos = TRUE` to use `expand` instead of
-    `distinct`
+    variables supplied. \* If you want to get cominations of variables
+    not present in the data set, you can set `all_combos = TRUE` to use
+    `expand` instead of `distinct`

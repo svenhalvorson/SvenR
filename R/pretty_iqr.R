@@ -11,10 +11,26 @@
 pretty_iqr = function(x, digits = 1, na.rm = TRUE){
 
   # compute median and quantile
-  med = round(x = median(x = x, na.rm = na.rm),
-              digits = digits)
-  quant = round(x = quantile(x = x, probs = c(0.25, 0.75), na.rm = na.rm),
-                digits = digits)
+  med = round(
+    x = median(
+      x = x,
+      na.rm = na.rm
+      ),
+    digits = digits
+    ) %>%
+    format(
+      nsmall = digits
+    )
+  quant = round(
+    x = quantile(
+      x = x,
+      probs = c(0.25, 0.75),
+      na.rm = na.rm),
+    digits = digits
+  ) %>%
+    format(
+      nsmall = digits
+    )
   paste0(med, ' [', paste(quant, collapse = ','), ']')
 
 }

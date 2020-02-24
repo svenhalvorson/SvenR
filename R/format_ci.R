@@ -130,6 +130,8 @@ round_ci =  function(point, lower, upper,
   if(!missing(null_value)){
     if(!is.na(null_value)){
       has_null = TRUE
+    } else{
+      has_null = FALSE
     }
   } else{
     has_null = FALSE
@@ -147,6 +149,8 @@ round_ci =  function(point, lower, upper,
   if(!missing(unacceptables)){
     if(!is.na(unacceptables)){
       has_unacceptables = TRUE
+    } else{
+      has_unacceptables = FALSE
     }
   } else{
     has_unacceptables = FALSE
