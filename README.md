@@ -49,7 +49,7 @@ Here we’ll show an example with the **nycflights** dataset and **broom**
 # Make a binary variable of if the plane left on time:
 flights2 = nycflights13::flights %>% 
   mutate(
-    on_time = as.numeric(dep_delay > 0)
+    on_time = as.numeric(dep_delay <= 0)
   )
 
 # now make a logistic model of this with a few factors
@@ -81,19 +81,20 @@ on_time_est %>%
 
 |    term     | estimate  | conf.low  | conf.high |
 | :---------: | :-------: | :-------: | :-------: |
-| (Intercept) | 0.1310076 | 0.1274532 | 0.1346556 |
-|  dep\_time  | 1.0012690 | 1.0012532 | 1.0012848 |
-|  originJFK  | 0.6742601 | 0.6624013 | 0.6863258 |
-|  originLGA  | 0.6275463 | 0.6161296 | 0.6391691 |
-|  distance   | 1.0001032 | 1.0000929 | 1.0001134 |
+| (Intercept) | 7.6331444 | 7.4263549 | 7.8460189 |
+|  dep\_time  | 0.9987326 | 0.9987168 | 0.9987484 |
+|  originJFK  | 1.4831072 | 1.4570339 | 1.5096590 |
+|  originLGA  | 1.5935080 | 1.5645311 | 1.6230351 |
+|  distance   | 0.9998968 | 0.9998866 | 0.9999071 |
 
 There are a number of problems you can come across when trying to round
-the confidence intervals. One of which is that the (likely) null value
-for this model is 1 but the way broom displays the point & 95% CI for
-departure time as 1 (1, 1) which is unhelpful. You can’t tell which side
-of the null value some of these estimates are. This function can be set
-with a null value and other unacceptable values which will not be
-allowed as endpoints of the CI:
+the confidence intervals. One of which is that you are likely to use a
+null value of 1 but you don’t want any of these numbers to be rounded to
+that. Another concern is that you would like to have three distinct
+numbers displayed so that we can properly see the width of the number
+and whether it contains the null value. This function can be set with a
+null value and other unacceptable values which will not be allowed as
+endpoints of the CI:
 
 ``` r
 
@@ -114,11 +115,11 @@ with(
 
 |  point  |  lower  |  upper  |             CI             |
 | :-----: | :-----: | :-----: | :------------------------: |
-|  0.131  |  0.127  |  0.135  |    0.131 (0.127, 0.135)    |
-| 1.00127 | 1.00125 | 1.00128 | 1.00127 (1.00125, 1.00128) |
-|  0.67   |  0.66   |  0.69   |     0.67 (0.66, 0.69)      |
-|  0.63   |  0.62   |  0.64   |     0.63 (0.62, 0.64)      |
-| 1.00010 | 1.00009 | 1.00011 | 1.00010 (1.00009, 1.00011) |
+|  7.63   |  7.43   |  7.85   |     7.63 (7.43, 7.85)      |
+| 0.99873 | 0.99872 | 0.99875 | 0.99873 (0.99872, 0.99875) |
+|  1.48   |  1.46   |  1.51   |     1.48 (1.46, 1.51)      |
+|  1.59   |  1.56   |  1.62   |     1.59 (1.56, 1.62)      |
+| 0.99990 | 0.99989 | 0.99991 | 0.99990 (0.99989, 0.99991) |
 
 You can tell it how many digits to round to but it will guess if not
 supplied. It has a maximum number of iterations to try before giving up
