@@ -77,6 +77,9 @@ on_time_est = on_time_model %>%
     conf.low,
     conf.high
   )
+```
+
+```{r ci_data_disp, echo = FALSE, fig.align = 'center'}
 
 on_time_est %>%
   kable(
@@ -88,9 +91,9 @@ on_time_est %>%
 
 There are a number of problems you can come across when trying to round the confidence intervals. One of which is that you are likely to use a null value of 1 but you don't want any of these numbers to be rounded to that. Another concern is that you would like to have three distinct numbers displayed so that we can properly see the width of the number and whether it contains the null value. This function can be set with a null value and other unacceptable values which will not be allowed as endpoints of the CI:
 
-```{r ci_display, fig.align = 'center'}
+```{r ci_create, fig.align = 'center'}
 
-with(
+on_time_est_fmt = with(
   on_time_est,
   format_ci(
     point = estimate,
@@ -98,12 +101,15 @@ with(
     upper = conf.high,
     null_value = 1
   )
-) %>% 
+)
+```
+
+```{r ci_display, echo = FALSE, fig.align = 'center'}
+on_time_est_fmt %>% 
   kable(
     align = 'c',
     format = 'markdown'
   )
-
 ```
 
 You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations to try before giving up so keep that in mind.
@@ -130,10 +136,16 @@ Here's some example data:
 ```{r twa_data, echo = FALSE, fig.align = 'center'}
 
 start_date = ymd_hms('2019-01-01 00:00:00')
-twa_ex = tibble(id = c(1, 1, 1, 1, 2, 2),
-                  val = c(4, 6, 8, 6, 1, NA),
-                  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date)
-kable(twa_ex, align = 'c', format = 'markdown' )
+twa_ex = tibble(
+  id = c(1, 1, 1, 1, 2, 2),
+  val = c(4, 6, 8, 6, 1, NA),
+  t = minutes(c(0, 10, 15, 45, 0, 10)) + start_date
+)
+kable(
+  twa_ex, 
+  align = 'c', 
+  format = 'markdown'
+)
 
 ```
 
@@ -148,9 +160,12 @@ id1 = twa_ex %>%
 id1 = id1 %>% 
   bind_rows(id1) %>% 
   bind_rows(id1) %>% 
-  mutate(group = case_when((row_number()-1) %/% 4 == 0 ~ 'Trapezoid',
-                           (row_number()-1) %/% 4 == 1 ~ 'Left',
-                           (row_number()-1) %/% 4 == 2 ~ 'Right'))
+  mutate(
+    group = case_when(
+      (row_number()-1) %/% 4 == 0 ~ 'Trapezoid',
+      (row_number()-1) %/% 4 == 1 ~ 'Left',
+      (row_number()-1) %/% 4 == 2 ~ 'Right')
+  )
 
 sticks = tribble(~t, ~val, ~group,
                  id1$t[1], 0, 'Trapezoid',
@@ -196,7 +211,13 @@ Using the function:
 
 ```{r twa_execute}
 
-twa(df = twa_ex, value_var = val, time_var = t, id, method = 'left')
+twa(
+  df = twa_ex, 
+  value_var = val, 
+  time_var = t, 
+  id, 
+  method = 'left'
+)
 
 ```
 
@@ -221,7 +242,15 @@ The four `ref_dir` modes are as follows:
 Here's an example of computing the time weighted average above 5:
 ```{r twa_execute2}
 
-twa(df = twa_ex, value_var = val, time_var = t, id, ref = 5, ref_dir = 'above', method = 'left')
+twa(
+  df = twa_ex, 
+  value_var = val, 
+  time_var = t, 
+  id, 
+  ref = 5, 
+  ref_dir = 'above', 
+  method = 'left'
+)
 
 ```
 
@@ -254,7 +283,11 @@ The first is simply a count of unique values for some supplied variables:
 
 ```{r count_ids_ex}
 
-count_ids(mtcars, cyl, carb)
+count_ids(
+  mtcars,
+  cyl, 
+  carb
+)
 
 ```
 We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`. It's pipe-able so you can see what changes a function will cause:
@@ -318,8 +351,10 @@ I also wrote a summary function, `col_miss`, for a data set. It computes the per
 
 ```{r col_miss1}
 
-dat1 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-                      y = c(NA, 'a', 'b', 'c', '', ''))
+dat1 = tibble::tibble(
+  x = c(NA, NA, 3, 4, NA, NA),
+  y = c(NA, 'a', 'b', 'c', '', '')
+)
 
 col_miss(dat1)
 ```

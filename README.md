@@ -71,12 +71,6 @@ on_time_est = on_time_model %>%
     conf.low,
     conf.high
   )
-
-on_time_est %>%
-  kable(
-    align = 'c',
-    format = 'markdown'
-  )
 ```
 
 |    term     | estimate  | conf.low  | conf.high |
@@ -98,7 +92,7 @@ endpoints of the CI:
 
 ``` r
 
-with(
+on_time_est_fmt = with(
   on_time_est,
   format_ci(
     point = estimate,
@@ -106,11 +100,7 @@ with(
     upper = conf.high,
     null_value = 1
   )
-) %>% 
-  kable(
-    align = 'c',
-    format = 'markdown'
-  )
+)
 ```
 
 |  point  |  lower  |  upper  |             CI             |
@@ -182,7 +172,13 @@ Using the function:
 
 ``` r
 
-twa(df = twa_ex, value_var = val, time_var = t, id, method = 'left')
+twa(
+  df = twa_ex, 
+  value_var = val, 
+  time_var = t, 
+  id, 
+  method = 'left'
+)
 #> # A tibble: 2 x 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
@@ -219,7 +215,15 @@ Here’s an example of computing the time weighted average above 5:
 
 ``` r
 
-twa(df = twa_ex, value_var = val, time_var = t, id, ref = 5, ref_dir = 'above', method = 'left')
+twa(
+  df = twa_ex, 
+  value_var = val, 
+  time_var = t, 
+  id, 
+  ref = 5, 
+  ref_dir = 'above', 
+  method = 'left'
+)
 #> # A tibble: 2 x 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
@@ -245,7 +249,11 @@ variables:
 
 ``` r
 
-count_ids(mtcars, cyl, carb)
+count_ids(
+  mtcars,
+  cyl, 
+  carb
+)
 #> [1] "32 observations"
 #>   cyl carb
 #> 1   3    6
@@ -387,8 +395,10 @@ the percent of observations that are missing for each column:
 
 ``` r
 
-dat1 = tibble::tibble(x = c(NA, NA, 3, 4, NA, NA),
-                      y = c(NA, 'a', 'b', 'c', '', ''))
+dat1 = tibble::tibble(
+  x = c(NA, NA, 3, 4, NA, NA),
+  y = c(NA, 'a', 'b', 'c', '', '')
+)
 
 col_miss(dat1)
 #> Percent missing by column for dat1 :
