@@ -7,6 +7,7 @@ SvenR
   - [Checking IDs](#checking-ids)
   - [Missing data](#missing-data)
   - [Creating Crosswalks](#creating-crosswalks)
+  - [A lovely hotkey](#a-lovely-hotkey)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -547,3 +548,13 @@ A few more notes:
     variables supplied. \* If you want to get cominations of variables
     not present in the data set, you can set `all_combos = TRUE` to use
     `expand` instead of `distinct`
+
+### A lovely hotkey
+
+This last piece might not seem so amazing but it’s actually one of the
+most useful things I’ve done in this library. It’s just a little add-in
+that takes whatever is left your cursor on that line and sets it equal
+to itself, then a pipe, and then puts the cursor to the next line
+indented. I set this to a hotkey and use it nonstop:
+
+![pipe lyfe](pipe_next.gif)

@@ -446,3 +446,11 @@ I did create some safegaurds to try and prevent people (mostly me) from deleting
 A few more notes:
 
 * Notice that `med_table` had 6 observations but the cross has 5. This is because `crosswalk` only takes distinct combinations of the variables supplied. * If you want to get cominations of variables not present in the data set, you can set `all_combos = TRUE` to use `expand` instead of `distinct`
+
+### A lovely hotkey
+
+This last piece might not seem so amazing but it's actually one of the most useful things I've done in this library. It's just a little add-in that takes whatever is left your cursor on that line and sets it equal to itself, then a pipe, and then puts the cursor to the next line indented. I set this to a hotkey and use it nonstop:
+
+![pipe lyfe](pipe_next.gif)
+
+
