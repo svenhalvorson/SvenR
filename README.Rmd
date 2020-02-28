@@ -449,7 +449,7 @@ A few more notes:
 
 ### A lovely hotkey
 
-This last piece might not seem so amazing but it's actually one of the most useful things I've done in this library. It's just a little add-in that takes whatever is left your cursor on that line and sets it equal to itself, then a pipe, and then puts the cursor to the next line indented. I set this to a hotkey and use it nonstop:
+This last piece might not seem so amazing but it's actually one of the most useful things I've done in this library. It's just a little add-in, called `pipe_next`, that takes whatever is left your cursor on that line and sets it equal to itself, then a pipe, and then puts the cursor to the next line indented. I set this to a hotkey and use it nonstop:
 
 ![pipe lyfe](pipe_next.gif)
 
