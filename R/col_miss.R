@@ -2,6 +2,7 @@
 #' @description Percent of values missing by column
 #' @param df A data frame
 #' @param empty_string Should only white space values be treated as NA?
+#' @param numeric_out Should the return value be unformatted numbers?
 #' @note Likely to be used interactively
 #' @author Sven Halvorson
 #' @examples
@@ -14,7 +15,10 @@
 #' col_miss(df)
 #' col_miss(df, empty_string = TRUE)
 #' @export
-col_miss = function(df, empty_string = FALSE){
+col_miss = function(
+  df,
+  empty_string = FALSE,
+  numeric_out = FALSE){
 
   # Capture data frame name:
   df_name = dplyr::enquo(df) %>%
@@ -30,24 +34,43 @@ col_miss = function(df, empty_string = FALSE){
     stop('empty_string must be either TRUE or FALSE')
   }
 
+  # Depending on whether we want formatted output:
+  round_fun = ifelse(
+    numeric_out,
+    identity,
+    round_per
+  )
+
   # if we want to check missing character values:
   if(empty_string){
     check_na = function(x){
       if(is.character(x)){
-        round_per(sum(is.na(x) | trimws(x) == '')/length(x))
+        round_fun(sum(is.na(x) | trimws(x) == '')/length(x))
       }
       else{
-        round_per(mean(is.na(x)))
+        round_fun(mean(is.na(x)))
       }
     }
   }
   else{
     check_na = function(x){
-      round_per(mean(is.na(x)))
+      round_fun(mean(is.na(x)))
     }
   }
   cat(paste('Percent missing by column for', df_name,':\n\n'))
-  vapply(X = df, FUN = function(x){paste0(check_na(x),'%') }, FUN.VALUE = character(1))
-
+  if(numeric_out){
+    vapply(
+      X = df,
+      FUN = check_na,
+      FUN.VALUE = numeric(1)
+    )
+  }
+  else{
+    vapply(
+      X = df,
+      FUN = function(x){paste0(check_na(x),'%') },
+      FUN.VALUE = character(1)
+    )
+  }
 
 }

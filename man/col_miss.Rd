@@ -4,12 +4,14 @@
 \alias{col_miss}
 \title{Column Missing Percent}
 \usage{
-col_miss(df, empty_string = FALSE)
+col_miss(df, empty_string = FALSE, numeric_out = FALSE)
 }
 \arguments{
 \item{df}{A data frame}
 
 \item{empty_string}{Should only white space values be treated as NA?}
+
+\item{numeric_out}{Should the return value be unformatted numbers?}
 }
 \description{
 Percent of values missing by column
