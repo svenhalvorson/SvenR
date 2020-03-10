@@ -46,9 +46,9 @@ Some of the functions I've tested quite a bit and others less so. If you find an
 
 ### Formatting numbers
 
-If I ever get the infamous interview question 'what is your biggest weakness?' I have an answer prepped: low tolerance for tedium. The idea of manually punching in lots of numbers to report is not only unappealing, it opens the door to unreproducible research. As a result, I created a function to round confidence intervals and one to make nice IQRs. I also have one for rounding cohort tables (produced by the **tableone** package) that I might clean up and post later.
+If I ever get the infamous interview question 'what is your biggest weakness?' I have an answer prepped: low tolerance for tedium. The idea of manually punching in lots of numbers to report is not only unappealing, it opens the door to unreproducible research. As a result, I created a function to round confidence intervals and one to make nice IQRs. I also have one for rounding cohort tables (produced by the `tableone` package) that I might clean up and post later.
 
-The first function, **format_ci** tries to make your confidence intervals cleaner and easier to read. It takes in three vectors (point estimate, upper/lower bounds) and starts and iterative rounding process. Here we'll show an example with the **nycflights** dataset and **broom**
+The first function, `format_ci` tries to make your confidence intervals cleaner and easier to read. It takes in three vectors (point estimate, upper/lower bounds) and starts and iterative rounding process. Here we'll show an example with the `nycflights` dataset and `broom`
 
 ```{r ci_data, fig.align = 'center'}
 
@@ -114,7 +114,7 @@ on_time_est_fmt %>%
 
 You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations to try before giving up so keep that in mind.
 
-Another formatting function I wrote is **pretty_iqr** which makes a nice version of a median [Q1, Q3] for a vector:
+Another formatting function I wrote is `pretty_iqr` which makes a nice version of a median [Q1, Q3] for a vector:
 
 ```{r pretty_iqr, fig.align = 'center'}
 
@@ -149,7 +149,7 @@ kable(
 
 ```
 
-The idea here is that have an **id** variable, a **val**ue variable, and a **t**ime variable. We want to summarize the value over time. There are three methods of counting the points that are supported: trapezoids and left/right endpoints.
+The idea here is that have an `id` variable, a `val`ue variable, and a `t`ime variable. We want to summarize the value over time. There are three methods of counting the points that are supported: trapezoids and left/right endpoints.
 
 Visually, id #1's values look like this:
 

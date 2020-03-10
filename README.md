@@ -38,12 +38,12 @@ of manually punching in lots of numbers to report is not only
 unappealing, it opens the door to unreproducible research. As a result,
 I created a function to round confidence intervals and one to make nice
 IQRs. I also have one for rounding cohort tables (produced by the
-**tableone** package) that I might clean up and post later.
+`tableone` package) that I might clean up and post later.
 
-The first function, **format\_ci** tries to make your confidence
-intervals cleaner and easier to read. It takes in three vectors (point
-estimate, upper/lower bounds) and starts and iterative rounding process.
-Here we’ll show an example with the **nycflights** dataset and **broom**
+The first function, `format_ci` tries to make your confidence intervals
+cleaner and easier to read. It takes in three vectors (point estimate,
+upper/lower bounds) and starts and iterative rounding process. Here
+we’ll show an example with the `nycflights` dataset and `broom`
 
 ``` r
 
@@ -116,8 +116,8 @@ You can tell it how many digits to round to but it will guess if not
 supplied. It has a maximum number of iterations to try before giving up
 so keep that in mind.
 
-Another formatting function I wrote is **pretty\_iqr** which makes a
-nice version of a median \[Q1, Q3\] for a vector:
+Another formatting function I wrote is `pretty_iqr` which makes a nice
+version of a median \[Q1, Q3\] for a vector:
 
 ``` r
 
@@ -147,13 +147,12 @@ Here’s some example data:
 | 2  |  1  | 2019-01-01 00:00:00 |
 | 2  | NA  | 2019-01-01 00:10:00 |
 
-The idea here is that have an **id** variable, a **val**ue variable, and
-a **t**ime variable. We want to summarize the value over time. There are
+The idea here is that have an `id` variable, a `val`ue variable, and a
+`t`ime variable. We want to summarize the value over time. There are
 three methods of counting the points that are supported: trapezoids and
 left/right endpoints.
 
-Visually, id \#1’s values look like
-this:
+Visually, id \#1’s values look like this:
 
 <img src="man/figures/README-twa_types-1.png" style="display: block; margin: auto;" />
 
@@ -162,8 +161,7 @@ time (45 min). The methods will produce similar results if the number of
 data points is large but they can be different in a small data set like
 this.
 
-The time weighted average using left endpoints is
-this:
+The time weighted average using left endpoints is this:
 
   
 ![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](https://latex.codecogs.com/png.latex?%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89
