@@ -84,12 +84,12 @@ on_time_est = on_time_model %>%
 
 There are a number of problems you can come across when trying to round
 the confidence intervals. One of which is that you are likely to use a
-null value of 1 but you don’t want any of these numbers to be rounded to
-that. Another concern is that you would like to have three distinct
-numbers displayed so that we can properly see the width of the number
-and whether it contains the null value. This function can be set with a
-null value and other unacceptable values which will not be allowed as
-endpoints of the CI:
+null value, such as 1 in the case of an odds ratio, but you don’t want
+any of these numbers to be rounded to that. Another concern is that you
+would like to have three distinct numbers displayed so that we can
+properly see the width of the interval and whether it contains the null
+value. This function can be set with a null value and other unacceptable
+values which will not be allowed as endpoints of the CI:
 
 ``` r
 
@@ -113,8 +113,8 @@ on_time_est_fmt = with(
 | 0.99990 | 0.99989 | 0.99991 | 0.99990 (0.99989, 0.99991) |
 
 You can tell it how many digits to round to but it will guess if not
-supplied. It has a maximum number of iterations to try before giving up
-so keep that in mind.
+supplied. It has a maximum number of iterations (which can be specified)
+to try before giving up so keep that in mind.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice
 version of a median \[Q1, Q3\] for a vector:
@@ -543,9 +543,10 @@ A few more notes:
 
   - Notice that `med_table` had 6 observations but the cross has 5. This
     is because `crosswalk` only takes distinct combinations of the
-    variables supplied. \* If you want to get cominations of variables
-    not present in the data set, you can set `all_combos = TRUE` to use
-    `expand` instead of `distinct`
+    variables supplied.  
+  - If you want to get cominations of variables not present in the data
+    set, you can set `all_combos = TRUE` to use `expand` instead of
+    `distinct`
 
 ### A lovely hotkey
 
