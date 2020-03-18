@@ -1,6 +1,7 @@
 #' SQL List
 #' @description Format an atomic vector for use with a SQL 'IN' statements
 #' @param x Atomic character or numeric vector
+#' @param quote Should each entry be surrounded with single quotes?
 #' @author Sven Halvorson
 #' @examples
 #' paste(

@@ -8,6 +8,8 @@ sql_list(x, quote = TRUE)
 }
 \arguments{
 \item{x}{Atomic character or numeric vector}
+
+\item{quote}{Should each entry be surrounded with single quotes?}
 }
 \description{
 Format an atomic vector for use with a SQL 'IN' statements

@@ -17,6 +17,12 @@ use these (mostly interactively) in the course of my work. In any case
 creating a library is fun so maybe you will enjoy it too. I’ll show some
 examples of what the code can do and what the ideas behind it are.
 
+**Recent notes (2020-03-12):**  
+\* Added `format_ci` and `sql_list`  
+\* Would like to read [this
+book](https://tidyeval.tidyverse.org/index.html) and clean up the janky
+NSE in some of my functions.
+
 ### Installation
 
 Get it from [github](https://www.github.com/svenhalvorson/svenr):
