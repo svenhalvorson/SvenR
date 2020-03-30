@@ -32,9 +32,9 @@ find_cols = function(df, ..., value = TRUE, ignore.case = TRUE){
   }
   arguments %>%
     purrr::map(.f = grep,
-            x = colnames(df),
-            ignore.case = ignore.case,
-            value = value) %>%
+               x = colnames(df),
+               ignore.case = ignore.case,
+               value = value) %>%
     unlist %>%
     unique %>%
     sort
