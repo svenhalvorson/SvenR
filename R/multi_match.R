@@ -85,24 +85,13 @@ multi_match = function(
     return(match_mat)
   }
 
-  # Otherwise we need to do some kind of coalesce thing:
-  match_mat = match_mat %>%
-    mutate_all(
-      function(y){
-        replace(
-          x = y,
-          list = y == 0,
-          values = NA
-        )
-      }
-    )
-
-  # Want to use an index here as there could be repeated replacements
-  for(i in seq_along(replacements)){
-    match_mat[[replacements[i]]] = replace(
-      x = match_mat[[replacements[i]]],
-      list = match_mat[[replacements[i]]] == 1,
-      values = replacements[i]
+  # I found that mutate_all does not work with repeated column names
+  # so we must use base R tricks for this:
+  for(i in seq_along(match_mat)){
+    match_mat[[i]] = ifelse(
+      test = match_mat[[i]] == 1,
+      yes = replacements[i],
+      no = NA
     )
   }
 
