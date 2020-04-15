@@ -171,7 +171,7 @@ this.
 The time weighted average using left endpoints is this:
 
   
-![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](https://latex.codecogs.com/png.latex?%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89
+![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](http://chart.apis.google.com/chart?cht=tx&chl=%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89
 "\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89")  
 
 Using the function:
