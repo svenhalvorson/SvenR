@@ -154,7 +154,8 @@ twa = function(df, value_var, time_var, ...,
   df  %>%
     bind_fun(original_readings) %>%
     bind_fun(used_readings) %>%
-    bind_fun(miss_output)
+    bind_fun(miss_output) %>%
+    dplyr::ungroup()
 
 }
 
