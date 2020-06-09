@@ -184,8 +184,7 @@ round_ci =  function(point, lower, upper,
     if(has_null){
       if(
         any(
-          vals[2] == null_value,
-          vals[3] == null_value,
+          sum(vals == null_value) > 0,,
           (lower - null_value < 0) != (vals[2] - null_value < 0),
           (upper - null_value < 0) != (vals[3] - null_value < 0)
         )

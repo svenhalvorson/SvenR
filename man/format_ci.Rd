@@ -4,8 +4,15 @@
 \alias{format_ci}
 \title{Format Confidence Intervals}
 \usage{
-format_ci(point, lower, upper, null_value = NA_real_,
-  digits = NA_real_, max_its = 4, unacceptables = NA_real_)
+format_ci(
+  point,
+  lower,
+  upper,
+  null_value = NA_real_,
+  digits = NA_real_,
+  max_its = 4,
+  unacceptables = NA_real_
+)
 }
 \arguments{
 \item{point, }{lower, upper The point estimate, lower bound, and upper bound.}

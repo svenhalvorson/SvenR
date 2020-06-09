@@ -4,8 +4,15 @@
 \alias{twa}
 \title{Time Weighted Averages}
 \usage{
-twa(df, value_var, time_var, ..., method = "trapezoid", ref = 0,
-  ref_dir = "raw")
+twa(
+  df,
+  value_var,
+  time_var,
+  ...,
+  method = "trapezoid",
+  ref = 0,
+  ref_dir = "raw"
+)
 }
 \arguments{
 \item{df}{a data frame, assumed to be in a 'long form' with time values in a single column}

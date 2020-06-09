@@ -4,8 +4,14 @@
 \alias{multi_match}
 \title{Multiple pattern matching}
 \usage{
-multi_match(strings, patterns, replacements, ignore_case = TRUE,
-  compress = TRUE, first = TRUE)
+multi_match(
+  strings,
+  patterns,
+  replacements,
+  ignore_case = TRUE,
+  compress = TRUE,
+  first = TRUE
+)
 }
 \arguments{
 \item{strings}{A vector of strings to be matched}
