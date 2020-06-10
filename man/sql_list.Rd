@@ -4,12 +4,14 @@
 \alias{sql_list}
 \title{SQL List}
 \usage{
-sql_list(x, quote = TRUE)
+sql_list(x, quote = TRUE, wildcard = FALSE)
 }
 \arguments{
 \item{x}{Atomic character or numeric vector}
 
 \item{quote}{Should each entry be surrounded with single quotes?}
+
+\item{wildcard}{Should each entry be surrounded with percent signs? Used for wildcard matching}
 }
 \description{
 Format an atomic vector for use with a SQL 'IN' statements
@@ -18,8 +20,8 @@ Format an atomic vector for use with a SQL 'IN' statements
 paste(
   'SELECT nonsense',
   'FROM your_table',
-  'WERE nonsense IN',
-  sql_list(letters[1:5]),
+  'WERE nonsense LIKE ANY',
+  sql_list(letters[1:5], wildcard = TRUE),
   ';'
 )
 }
