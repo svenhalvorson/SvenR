@@ -9,7 +9,7 @@ ventile(x, quiet = TRUE)
 \arguments{
 \item{x}{a numeric vector}
 
-\item{quiet}{Should it print observation count and missing rate?}
+\item{quiet}{should it print observation count and missing rate?}
 }
 \value{
 a numeric vector of 19 quantiles
