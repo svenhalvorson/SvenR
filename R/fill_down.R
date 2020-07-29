@@ -2,6 +2,7 @@
 #' @description Fill missing value with most recent non-missing value
 #' @param x An atomic vector
 #' @param empty_string Should empty strings be treated as NA?
+#' @param reverse Should we fill up instead?
 #' @author Sven Halvorson
 #' @examples
 #' NM = c(NA, 'Ruidoso', NA, '', NA, 'Corona', NA, 'Roswell')

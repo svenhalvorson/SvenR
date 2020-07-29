@@ -31,6 +31,6 @@ pretty_iqr = function(x, digits = 1, na.rm = TRUE){
     format(
       nsmall = digits
     )
-  paste0(med, ' [', paste(quant, collapse = ','), ']')
+  paste0(med, ' [', paste(quant, collapse = ', '), ']')
 
 }

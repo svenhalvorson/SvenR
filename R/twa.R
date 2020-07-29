@@ -17,6 +17,7 @@
 #' @param ref a value to compute the TWA relative to
 #' @param ref_dir the direction to compute the average relative to ref, one of \code{c('raw', 'above', 'below', 'about')}
 #' @return a data frame containing any grouping variables, the computed twa, and some other summary statistics
+#' @note Need to check out this behavior as the behavior of summarize on grouped dataframes changed with dplyr 1.0 >:(
 #' @examples
 #' start_date = lubridate::ymd_hms('2019-01-01 00:00:00')
 #' time_dat = tibble::tibble(id = c(1, 1, 1, 1, 2, 2),
@@ -89,7 +90,7 @@ twa = function(df, value_var, time_var, ...,
 
   # 3) We have only one reading per time point*group
   df = df %>%
-    dplyr::group_by(!!time_var, add = TRUE) %>%
+    dplyr::group_by(!!time_var, .add = TRUE) %>%
     dplyr::summarize(!!value_var := median(!!value_var)) %>%
     (dplyr::ungroup)
 
