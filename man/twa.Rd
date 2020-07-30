@@ -45,6 +45,9 @@ Rows with missing. If only one value within a grouping level is supplied, that v
 and the number of values received, used, and omitted. When \code{time_var} is \code{POSIXct}, \code{twa}
 will default to minutes.
 }
+\note{
+Need to check out this behavior as the behavior of summarize on grouped dataframes changed with dplyr 1.0 >:(
+}
 \examples{
 start_date = lubridate::ymd_hms('2019-01-01 00:00:00')
 time_dat = tibble::tibble(id = c(1, 1, 1, 1, 2, 2),

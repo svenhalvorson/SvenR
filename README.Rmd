@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, include=FALSE}
-.libPaths("C:/Users/HALVORS/Documents/rlibs")
+.libPaths("C:/Users/HALVORS/Documents/rlibs4")
 library('lubridate')
 library('tidyverse')
 library('kableExtra')
@@ -32,11 +32,6 @@ library('SvenR')
 
 
 I like to pretend I'm a software developer so I created this little package. It's not a super fancy or cohesive group of functions but I do use these (mostly interactively) in the course of my work. In any case creating a library is fun so maybe you will enjoy it too. I'll show some examples of what the code can do and what the ideas behind it are.
-
-**Recent notes (end of March 2020):**  
-  
-* Added `format_ci`, `sql_list`, and `multi_match` 
-* Read [this book](https://tidyeval.tidyverse.org/index.html) but I'm not sure how/if I should clean up the janky NSE in some of my functions.  
 
 ### Installation
 
@@ -117,7 +112,7 @@ on_time_est_fmt %>%
   )
 ```
 
-You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind.
+You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind. I also added a similar function, `round_p` to deal with p-values in the same spirit.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice version of a median [Q1, Q3] for a vector:
 

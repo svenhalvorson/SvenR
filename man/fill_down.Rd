@@ -10,6 +10,8 @@ fill_down(x, empty_string = FALSE, reverse = FALSE)
 \item{x}{An atomic vector}
 
 \item{empty_string}{Should empty strings be treated as NA?}
+
+\item{reverse}{Should we fill up instead?}
 }
 \description{
 Fill missing value with most recent non-missing value

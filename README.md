@@ -17,13 +17,6 @@ use these (mostly interactively) in the course of my work. In any case
 creating a library is fun so maybe you will enjoy it too. I’ll show some
 examples of what the code can do and what the ideas behind it are.
 
-**Recent notes (end of March 2020):**
-
-  - Added `format_ci`, `sql_list`, and `multi_match`
-  - Read [this book](https://tidyeval.tidyverse.org/index.html) but I’m
-    not sure how/if I should clean up the janky NSE in some of my
-    functions.
-
 ### Installation
 
 Get it from [github](https://www.github.com/svenhalvorson/svenr):
@@ -121,7 +114,8 @@ on_time_est_fmt = with(
 
 You can tell it how many digits to round to but it will guess if not
 supplied. It has a maximum number of iterations (which can be specified)
-to try before giving up so keep that in mind.
+to try before giving up so keep that in mind. I also added a similar
+function, `round_p` to deal with p-values in the same spirit.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice
 version of a median \[Q1, Q3\] for a vector:
@@ -132,7 +126,7 @@ pretty_iqr(
   x = flights2$dep_delay,
   digits = 1
 )
-#> [1] "-2.0 [-5.0,11.0]"
+#> [1] "-2.0 [-5.0, 11.0]"
 ```
 
 ### Time Weighted Averages
@@ -185,6 +179,10 @@ twa(
   id, 
   method = 'left'
 )
+#> Warning in max(time_diff, na.rm = TRUE): no non-missing arguments to max;
+#> returning -Inf
+#> Warning in min(time_diff, na.rm = TRUE): no non-missing arguments to min;
+#> returning Inf
 #> # A tibble: 2 x 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
@@ -230,6 +228,10 @@ twa(
   ref_dir = 'above', 
   method = 'left'
 )
+#> Warning in max(time_diff, na.rm = TRUE): no non-missing arguments to max;
+#> returning -Inf
+#> Warning in min(time_diff, na.rm = TRUE): no non-missing arguments to min;
+#> returning Inf
 #> # A tibble: 2 x 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
