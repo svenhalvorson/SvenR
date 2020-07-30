@@ -112,7 +112,7 @@ on_time_est_fmt %>%
   )
 ```
 
-You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind. I added the function `round_p` to deal with p-values in the same spirit.
+You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind. I added the function `format_p` to deal with p-values in the same spirit.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice version of a median [Q1, Q3] for a vector:
 
