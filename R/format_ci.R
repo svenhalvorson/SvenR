@@ -55,7 +55,7 @@ format_ci = function(
   max_its = 4,
   unacceptables = NA_real_
 ){
-
+  
   # First thing is to do the checks
   if(
     any(
@@ -64,7 +64,7 @@ format_ci = function(
       missing(upper)
     )
   ){
-    stop('point, lower, and upper must all be supplied')
+    warning('missing values for point, lower, or upper supplied')
   }
   # All CI arguments must be numeric atomics:
   point = unlist(point)
@@ -116,7 +116,10 @@ format_ci = function(
   cis %>%
     dplyr::bind_rows() %>%
     dplyr::mutate(
-      CI = paste0(point, ' (', lower, ', ', upper, ')')
+      CI = dplyr::case_when(
+        is.na(point) | is.na(lower) | is.na(upper) ~ NA_character_,
+        TRUE ~ paste0(point, ' (', lower, ', ', upper, ')')
+      )
     )
 
 }
@@ -125,7 +128,25 @@ format_ci = function(
 round_ci =  function(point, lower, upper,
                      digits, null_value,
                      max_its = 4, unacceptables){
-
+  
+  # If missing any:
+  if(
+    any(
+      is.na(point),
+      is.na(lower),
+      is.na(upper)
+    )
+  ){
+    return(
+      tibble::tibble(
+        point = NA_character_,
+        lower = NA_character_,
+        upper = NA_character_
+      ) 
+    )
+  }
+  
+  
   # Are we testing against a null value?
   if(!missing(null_value)){
     if(!is.na(null_value)){
@@ -220,7 +241,7 @@ round_ci =  function(point, lower, upper,
 
 choose_digits = function(lower, upper){
 
-  # Use this little doohickey to selet the appropriate starting digits
+  # Use this little doohickey to select the appropriate starting digits
   # if the user doesn't supply them for one or more intervals:
 
   if(lower >= upper){
