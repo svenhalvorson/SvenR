@@ -51,6 +51,10 @@ format_p = function(
 
   # small function to round each p-value:
   round_p = function(p){
+    
+    if(is.na(p)){
+      return(NA_character_)
+    }
 
     round_p = round(p, min_digits)
     # If we have a value over level:
