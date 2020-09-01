@@ -1,4 +1,3 @@
-
 #' Check IDs
 #' @description Test keys for uniqueness or try to find unique keys
 #' @param df A data frame
