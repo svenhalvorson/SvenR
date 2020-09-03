@@ -1,6 +1,6 @@
 #' Format Confidence Intervals
 #' @description Round and format confidence intervals for presentation.
-#' @param point, lower, upper The point estimate, lower bound, and upper bound.
+#' @param point,lower,upper Point estimates, lower bounds, and upper bounds.
 #' @param digits A vector of digits to begin rounding at.
 #' @param max_its The maximum number of additiona digits to give
 #' @param null_value A vector of null values to be compared to.
@@ -55,7 +55,7 @@ format_ci = function(
   max_its = 4,
   unacceptables = NA_real_
 ){
-  
+
   # First thing is to do the checks
   if(
     any(
@@ -128,7 +128,7 @@ format_ci = function(
 round_ci =  function(point, lower, upper,
                      digits, null_value,
                      max_its = 4, unacceptables){
-  
+
   # If missing any:
   if(
     any(
@@ -142,11 +142,11 @@ round_ci =  function(point, lower, upper,
         point = NA_character_,
         lower = NA_character_,
         upper = NA_character_
-      ) 
+      )
     )
   }
-  
-  
+
+
   # Are we testing against a null value?
   if(!missing(null_value)){
     if(!is.na(null_value)){

@@ -15,7 +15,7 @@ format_ci(
 )
 }
 \arguments{
-\item{point, }{lower, upper The point estimate, lower bound, and upper bound.}
+\item{point, lower, upper}{Point estimates, lower bounds, and upper bounds.}
 
 \item{null_value}{A vector of null values to be compared to.}
 
