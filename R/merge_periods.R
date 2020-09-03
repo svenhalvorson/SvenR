@@ -107,7 +107,8 @@ merge_periods = function(
     df = df %>%
       dplyr::select(-data) %>%
       tidyr::unnest(cols = c(result)) %>%
-      dplyr::select(!!!grouping_vars, !!start_time, !!end_time)
+      dplyr::select(!!!grouping_vars, !!start_time, !!end_time) %>%
+      dplyr::ungroup()
     return(df)
   }else{
     if(plots){
