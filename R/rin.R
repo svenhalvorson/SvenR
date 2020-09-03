@@ -1,13 +1,13 @@
 #' @title Reverse In
 #' @description Reverse of infix \code{\%in\%}
 #' @author Sven Halvorse
-#' @examples 'a' %nin% letters
-#' 'a' %nin% LETTERS
+#' @examples 'a' %rin% letters
+#' LETTERS %rin% 'a'
 #' @param x values to be matched against
 #' @param y values to be matched
 #' @seealso match
-#' @rdname nin
+#' @rdname rin
 #' @export
-"%nin%" = function(x,y){
-!(y %in% x)
+"%rin%" = function(x,y){
+(y %in% x)
 }
