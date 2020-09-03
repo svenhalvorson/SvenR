@@ -47,7 +47,8 @@ analysis_table = glm(
   family = binomial
 ) \%>\%
   broom::tidy(
-    conf.int = TRUE
+    conf.int = TRUE,
+    exponentiate = TRUE
   )
 
 cis = format_ci(
