@@ -4,7 +4,7 @@
 \alias{format_p}
 \title{Format p-values}
 \usage{
-format_p(p, min_digits = 2, max_digits = 3, level = 0.05)
+format_p(p, min_digits = 2, max_digits = 3, level = 0.05, write_p = TRUE)
 }
 \arguments{
 \item{p}{A numeric vector of p-values to be formatted}
@@ -14,6 +14,8 @@ format_p(p, min_digits = 2, max_digits = 3, level = 0.05)
 \item{max_digits}{The maximum number of digits to display for a small p-value}
 
 \item{level}{Significance level tested at}
+
+\item{write_p}{If \code{TRUE}, small values will be written as 'P < 0.001', otherwise will be '< 0.001'}
 }
 \value{
 An atomic character vector
