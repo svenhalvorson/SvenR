@@ -4,6 +4,7 @@
 #' @param min_digits The minimum number of digits to display
 #' @param max_digits The maximum number of digits to display for a small p-value
 #' @param level Significance level tested at
+#' @param write_p If \code{TRUE}, small values will be written as 'P < 0.001', otherwise will be '< 0.001'
 #' @return An atomic character vector
 #' @details The goal of this function is to round P values for tables or text.
 #' If rounding a p value to \code{min_digits} is not 0, 1, or the significance level, that is returned.
@@ -26,7 +27,8 @@ format_p = function(
   p,
   min_digits = 2,
   max_digits = 3,
-  level = 0.05
+  level = 0.05,
+  write_p = TRUE
 ){
 
   # Checks:
@@ -51,7 +53,7 @@ format_p = function(
 
   # small function to round each p-value:
   round_p = function(p){
-    
+
     if(is.na(p)){
       return(NA_character_)
     }
@@ -83,7 +85,8 @@ format_p = function(
     } else if(round_p == 0){
       if(p < 10^(-max_digits)){
         paste0(
-          'P < 0.',
+          ifelse(write_p, 'P ', ''),
+          '< 0.',
           paste0(
             rep('0', times = max_digits - 1),
             collapse = ''
@@ -100,13 +103,12 @@ format_p = function(
     }
     # Last case is p near 1:
     else{
-      i = 0
-      while(round(p, max_digits + i) == 1){
-        i = i + 1
-      }
-      format(
-        round(p, max_digits + i),
-        nsmall = max_digits + i
+      paste0(
+        '0.',
+        paste0(
+          rep('9', times = min_digits),
+          collapse = ''
+        )
       )
     }
   }
