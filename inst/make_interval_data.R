@@ -60,7 +60,8 @@ periods_data = periods_data %>%
   ) %>%
   unnest(c(data, repeated_vals)) %>%
   ungroup() %>%
-  select(-start_times)
+  select(-start_times) %>%
+  arrange(id, ts_start, ts_end)
 
 usethis::use_data(periods_data, overwrite = TRUE)
 
