@@ -30,7 +30,6 @@ library('kableExtra')
 library('SvenR')
 ```
 
-
 I like to pretend I'm a software developer so I created this little package. It's not a super fancy or cohesive group of functions but I do use these (mostly interactively) in the course of my work. In any case creating a library is fun so maybe you will enjoy it too. I'll show some examples of what the code can do and what the ideas behind it are.
 
 ### Installation
@@ -112,7 +111,24 @@ on_time_est_fmt %>%
   )
 ```
 
-You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind. I added the function `format_p` to deal with p-values in the same spirit.
+You can tell it how many digits to round to but it will guess if not supplied. It has a maximum number of iterations (which can be specified) to try before giving up so keep that in mind. 
+  
+I added the function `format_p` to deal with p-values in the same spirit:
+
+```{r show_p}
+
+p_vals = c(0.05033, 0.7894, 0.999964, 0.00007)
+
+format_p(
+  p = p_vals,
+  min_digits = 3,
+  max_digits = 4,
+  level = 0.05
+)
+
+```
+
+Like `format_ci`, I force the rounding not to round to potentially ambiguous values. The `min_digits` I asked for was three but the first p-value goes to four digits to be clear about which side of the significance level it's on. The argument `max_digits` controls how small a p-value can be before it is listed as 'P < 0.00....1'.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice version of a median [Q1, Q3] for a vector:
 
@@ -127,7 +143,7 @@ pretty_iqr(
 
 
 
-### Time Weighted Averages
+### Time weighted averages
 
 Time weighted averages are a way of summarizing a numerical variable over many time points. It's often useful when the measurements occur at irregular intervals. Basically we're multiplying the values by how long they occur for and then dividing by the total time. It's very similar to taking a Riemann sum.
 
@@ -275,6 +291,80 @@ ggplot() +
 
 This can be useful if you have a benchmark value you're trying to compare to. Note that it uses the entire 45 minutes as the denominator even though the first reading was set to zero because it is less than 5.
 
+### Merging time intervals
+
+Another problem I have encountered more than a few times is when records of events are broken up across multiple observations that capture time intervals. An example of this is records of a patient's stay in the ICU. Every time they move rooms the attending caregiver may enter a new record of when the patient came in and out. Often this style of measurement is not recorded very accurately and we may have gaps between the in/out times, overlaps between records, and records that are purely within the timespan of another.
+
+For many research questions, these changes don't matter. We just want to know when they first entered and finally left. To address this I wrote a function, `merge_periods`, to join time intervals together. Here is some data I simulated to demonstrate this:
+
+```{r show_period_data}
+data(periods_data)
+periods_data
+
+
+```
+
+Here we can see that there is a 8 minute gap between the first and second observations. The third and fourth overlap quite a bit. Here is how we can call `merge_periods` to clean the data:
+
+```{r merge_periods}
+
+merged_periods = merge_periods(
+  df = periods_data,
+  start_time = ts_start,
+  end_time = ts_end,
+  id,
+  tolerance = 3,
+  units = 'minutes'
+)
+
+```
+
+The required arguments supplied are the data frame (`df`) and the column names of the start and end time. After that any number of columns to group by can be supplied (in this case just `id`). Then there are optional named arguments such as `tolerance` which will allow gaps of that number of `units` to be merged together. With this call the first and second records will not be merged since they are 8 minutes apart but the second and third will. Here is some of the output:
+
+```{r show_merge_periods}
+
+merged_periods
+
+```
+
+In the revised data set, we have fewer rows as several of the records have been deleted or combined. Here the first row stays the same since it is more than three minutes from the next but rows 2, 3, and 4 have all been combined.
+  
+Another feature of this is that you can optionally return a nested data fram that contains the original and merged data along with optional plots:
+
+```{r merge_periods2, results = 'hide'}
+
+merged_periods2 = merge_periods(
+  df = periods_data,
+  start_time = ts_start,
+  end_time = ts_end,
+  id,
+  tolerance = 3,
+  units = 'minutes',
+  simplify = FALSE,
+  plots = TRUE
+)
+
+```
+
+When `simplify = FALSE` the result is a nested tibble that contains the original and merged data:
+
+
+```{r show_merge_periods2}
+
+merged_periods2
+
+```
+
+If `plots = TRUE` then we have another column of ggplots showing how the intervals were combined:
+
+```{r merge_plot, fig.align='center', fig.align='center', fig.width=4, fig.height=3.5}
+
+merged_periods2$plot[[1]]
+
+```
+
+This can be used to check whether or not the function is working correctly, look for patterns in the periods across cases, and pick a suitable tolerance for merging.
+
 ### Checking IDs
 
 I often get data where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions that help with these types of problems. They are mostly for interactive use.
@@ -383,25 +473,30 @@ I later found out that the function `tidyr::fill` does almost the same thing. `f
 
 For these reasons I've kept it around but it's not necessary most of the time.
 
-### Creating Crosswalks
+### Creating crosswalks
 
 Frequently I encounter text data that I want to bin. This often comes about when I have hand written records or data with very slight variations on a theme. Sometimes it's easy enough to do this with regular expressions but I often find these unreliable if the underlying data changes. Sometimes it's nicer to just make a crosswalk manually so I created a shiny gadget to do exactly this. 
 
 Here's an example data set of hospital visits to different departments:
 
 ```{r cross_table}
-med_table = tibble::tibble(dept = c('pulmonary',
-                            'pulmonary',
-                            'heart',
-                            'cardio',
-                            'cardio',
-                            'pulm'),
-                   visit = c('surgery',
-                             'surg',
-                             'visit',
-                             'surgery',
-                             'surgery',
-                             'office'))
+med_table = tibble::tibble(
+  dept = c(
+    'pulmonary',
+    'pulmonary',
+    'heart',
+    'cardio',
+    'cardio',
+    'pulm'),
+  visit = c(
+    'surgery',
+    'surg',
+    'visit',
+    'surgery',
+    'surgery',
+    'office'
+  )
+)
 med_table
 ```
 
@@ -447,6 +542,7 @@ A few more notes:
 
 * Notice that `med_table` had 6 observations but the cross has 5. This is because `crosswalk` only takes distinct combinations of the variables supplied.  
 * If you want to get cominations of variables not present in the data set, you can set `all_combos = TRUE` to use `expand` instead of `distinct`
+
 
 ### A lovely hotkey
 

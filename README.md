@@ -3,10 +3,11 @@ SvenR
 
   - [Installation](#installation)
   - [Formatting numbers](#formatting-numbers)
-  - [Time Weighted Averages](#time-weighted-averages)
+  - [Time weighted averages](#time-weighted-averages)
+  - [Merging time intervals](#merging-time-intervals)
   - [Checking IDs](#checking-ids)
   - [Missing data](#missing-data)
-  - [Creating Crosswalks](#creating-crosswalks)
+  - [Creating crosswalks](#creating-crosswalks)
   - [A lovely hotkey](#a-lovely-hotkey)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -114,8 +115,29 @@ on_time_est_fmt = with(
 
 You can tell it how many digits to round to but it will guess if not
 supplied. It has a maximum number of iterations (which can be specified)
-to try before giving up so keep that in mind. I added the function
-`format_p` to deal with p-values in the same spirit.
+to try before giving up so keep that in mind.
+
+I added the function `format_p` to deal with p-values in the same
+spirit:
+
+``` r
+
+p_vals = c(0.05033, 0.7894, 0.999964, 0.00007)
+
+format_p(
+  p = p_vals,
+  min_digits = 3,
+  max_digits = 4,
+  level = 0.05
+)
+#> [1] "0.0503"     "0.789"      "0.999"      "P < 0.0001"
+```
+
+Like `format_ci`, I force the rounding not to round to potentially
+ambiguous values. The `min_digits` I asked for was three but the first
+p-value goes to four digits to be clear about which side of the
+significance level it’s on. The argument `max_digits` controls how small
+a p-value can be before it is listed as ‘P \< 0.00….1’.
 
 Another formatting function I wrote is `pretty_iqr` which makes a nice
 version of a median \[Q1, Q3\] for a vector:
@@ -129,7 +151,7 @@ pretty_iqr(
 #> [1] "-2.0 [-5.0, 11.0]"
 ```
 
-### Time Weighted Averages
+### Time weighted averages
 
 Time weighted averages are a way of summarizing a numerical variable
 over many time points. It’s often useful when the measurements occur at
@@ -244,6 +266,150 @@ twa(
 This can be useful if you have a benchmark value you’re trying to
 compare to. Note that it uses the entire 45 minutes as the denominator
 even though the first reading was set to zero because it is less than 5.
+
+### Merging time intervals
+
+Another problem I have encountered more than a few times is when records
+of events are broken up across multiple observations that capture time
+intervals. An example of this is records of a patient’s stay in the ICU.
+Every time they move rooms the attending caregiver may enter a new
+record of when the patient came in and out. Often this style of
+measurement is not recorded very accurately and we may have gaps between
+the in/out times, overlaps between records, and records that are purely
+within the timespan of another.
+
+For many research questions, these changes don’t matter. We just want to
+know when they first entered and finally left. To address this I wrote a
+function, `merge_periods`, to join time intervals together. Here is some
+data I simulated to demonstrate this:
+
+``` r
+data(periods_data)
+periods_data
+#> # A tibble: 241 x 3
+#>       id ts_start            ts_end             
+#>    <int> <dttm>              <dttm>             
+#>  1     1 2020-11-03 03:20:00 2020-11-03 03:29:00
+#>  2     1 2020-11-03 03:37:00 2020-11-03 03:42:00
+#>  3     1 2020-11-03 03:45:00 2020-11-03 03:53:00
+#>  4     1 2020-11-03 03:46:00 2020-11-03 03:55:00
+#>  5     1 2020-11-03 04:01:00 2020-11-03 04:21:00
+#>  6     1 2020-11-03 04:13:00 2020-11-03 04:29:00
+#>  7     1 2020-11-03 04:31:00 2020-11-03 04:43:00
+#>  8     1 2020-11-03 04:44:00 2020-11-03 04:52:00
+#>  9     1 2020-11-03 04:53:00 2020-11-03 04:56:00
+#> 10     1 2020-11-03 04:58:00 2020-11-03 05:00:00
+#> # ... with 231 more rows
+```
+
+Here we can see that there is a 8 minute gap between the first and
+second observations. The third and fourth overlap quite a bit. Here is
+how we can call `merge_periods` to clean the data:
+
+``` r
+
+merged_periods = merge_periods(
+  df = periods_data,
+  start_time = ts_start,
+  end_time = ts_end,
+  id,
+  tolerance = 3,
+  units = 'minutes'
+)
+#> 
+#> 
+#> Sorting data...
+#> 
+#> 
+#> 
+#> Merging periods...
+```
+
+The required arguments supplied are the data frame (`df`) and the column
+names of the start and end time. After that any number of columns to
+group by can be supplied (in this case just `id`). Then there are
+optional named arguments such as `tolerance` which will allow gaps of
+that number of `units` to be merged together. With this call the first
+and second records will not be merged since they are 8 minutes apart but
+the second and third will. Here is some of the output:
+
+``` r
+
+merged_periods
+#> # A tibble: 123 x 3
+#>       id ts_start            ts_end             
+#>    <int> <dttm>              <dttm>             
+#>  1     1 2020-11-03 03:20:00 2020-11-03 03:29:00
+#>  2     1 2020-11-03 03:37:00 2020-11-03 03:55:00
+#>  3     1 2020-11-03 04:01:00 2020-11-03 05:16:00
+#>  4     1 2020-11-03 05:52:00 2020-11-03 06:16:00
+#>  5     1 2020-11-03 06:56:00 2020-11-03 07:04:00
+#>  6     1 2020-11-03 07:12:00 2020-11-03 07:58:00
+#>  7     1 2020-11-03 08:05:00 2020-11-03 08:11:00
+#>  8     1 2020-11-03 08:18:00 2020-11-03 08:27:00
+#>  9     2 2020-11-03 06:17:00 2020-11-03 06:47:00
+#> 10     2 2020-11-03 07:47:00 2020-11-03 08:47:00
+#> # ... with 113 more rows
+```
+
+In the revised data set, we have fewer rows as several of the records
+have been deleted or combined. Here the first row stays the same since
+it is more than three minutes from the next but rows 2, 3, and 4 have
+all been combined.
+
+Another feature of this is that you can optionally return a nested data
+fram that contains the original and merged data along with optional
+plots:
+
+``` r
+
+merged_periods2 = merge_periods(
+  df = periods_data,
+  start_time = ts_start,
+  end_time = ts_end,
+  id,
+  tolerance = 3,
+  units = 'minutes',
+  simplify = FALSE,
+  plots = TRUE
+)
+```
+
+When `simplify = FALSE` the result is a nested tibble that contains the
+original and merged data:
+
+``` r
+
+merged_periods2
+#> # A tibble: 10 x 4
+#> # Rowwise:  id
+#>       id               data result            plot  
+#>    <int> <list<tbl_df[,2]>> <list>            <list>
+#>  1     1           [19 x 2] <tibble [8 x 2]>  <gg>  
+#>  2     2           [60 x 2] <tibble [30 x 2]> <gg>  
+#>  3     3           [40 x 2] <tibble [20 x 2]> <gg>  
+#>  4     4           [34 x 2] <tibble [18 x 2]> <gg>  
+#>  5     5            [2 x 2] <tibble [2 x 2]>  <gg>  
+#>  6     6           [14 x 2] <tibble [6 x 2]>  <gg>  
+#>  7     7            [4 x 2] <tibble [2 x 2]>  <gg>  
+#>  8     8           [19 x 2] <tibble [8 x 2]>  <gg>  
+#>  9     9           [37 x 2] <tibble [20 x 2]> <gg>  
+#> 10    10           [12 x 2] <tibble [9 x 2]>  <gg>
+```
+
+If `plots = TRUE` then we have another column of ggplots showing how the
+intervals were combined:
+
+``` r
+
+merged_periods2$plot[[1]]
+```
+
+<img src="man/figures/README-merge_plot-1.png" style="display: block; margin: auto;" />
+
+This can be used to check whether or not the function is working
+correctly, look for patterns in the periods across cases, and pick a
+suitable tolerance for merging.
 
 ### Checking IDs
 
@@ -451,7 +617,7 @@ thing. `fill_down` does two things differently though:
 For these reasons I’ve kept it around but it’s not necessary most of the
 time.
 
-### Creating Crosswalks
+### Creating crosswalks
 
 Frequently I encounter text data that I want to bin. This often comes
 about when I have hand written records or data with very slight
@@ -463,18 +629,23 @@ I created a shiny gadget to do exactly this.
 Here’s an example data set of hospital visits to different departments:
 
 ``` r
-med_table = tibble::tibble(dept = c('pulmonary',
-                            'pulmonary',
-                            'heart',
-                            'cardio',
-                            'cardio',
-                            'pulm'),
-                   visit = c('surgery',
-                             'surg',
-                             'visit',
-                             'surgery',
-                             'surgery',
-                             'office'))
+med_table = tibble::tibble(
+  dept = c(
+    'pulmonary',
+    'pulmonary',
+    'heart',
+    'cardio',
+    'cardio',
+    'pulm'),
+  visit = c(
+    'surgery',
+    'surg',
+    'visit',
+    'surgery',
+    'surgery',
+    'office'
+  )
+)
 med_table
 #> # A tibble: 6 x 2
 #>   dept      visit  
