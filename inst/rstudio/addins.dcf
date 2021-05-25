@@ -1,4 +1,4 @@
 Name: Pipe next
 Description: Sets line equal to itself and adds ' %>% \n  '
 Binding: pipe_next
-Interactive: true
+Interactive: false
