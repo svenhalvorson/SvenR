@@ -1,6 +1,7 @@
 #' @title Pipe to next line
 #' @description Copy text on left of cursor, paste it on right of \code{=}, then add pipe to next line.
-#'
+#' @export
+
 pipe_next = function(){
   # here's how we can get the location of the cursor:
   selection = rstudioapi::getSourceEditorContext()$selection[[1]]$range
