@@ -1,6 +1,6 @@
 #' Multiple pattern matching
 #' @description Match a character vector on multiple patterns.
-#' @param string A vector of string to be matched
+#' @param strings A vector of string to be matched
 #' @param patterns A vector of patterns to match
 #' @param replacements Replacement label vector of the same length as \code{patterns}. If missing, \code{patterns} is used.
 #' @param ignore_case Should case be ignored in regular expression matching?
