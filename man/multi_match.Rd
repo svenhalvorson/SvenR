@@ -14,6 +14,8 @@ multi_match(
 )
 }
 \arguments{
+\item{strings}{A vector of string to be matched}
+
 \item{patterns}{A vector of patterns to match}
 
 \item{replacements}{Replacement label vector of the same length as \code{patterns}. If missing, \code{patterns} is used.}
@@ -23,8 +25,6 @@ multi_match(
 \item{compress}{If \code{TRUE}, returns the first matched pattern (or label). Otherwise, returns a \code{tibble} of matches for each pattern}
 
 \item{first}{If \code{TRUE}, then the first match is returned otherwise the last is returned. This is ignored if \code{compress = FALSE}.}
-
-\item{string}{A vector of string to be matched}
 }
 \value{
 If \code{compress = TRUE}, returns a character vector. Otherwise, returns a tibble.
