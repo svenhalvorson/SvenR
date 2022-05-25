@@ -30,6 +30,11 @@ library('kableExtra')
 library('SvenR')
 ```
 
+TODO:  
+1. Disable the goofball `cosswalk` function. It doesn't really work for most use cases
+2. Check to see if `do_nothing()` still works
+3. Add example of python style rename.
+
 I like to pretend I'm a software developer so I created this little package. It's not a super fancy or cohesive group of functions but I do use these (mostly interactively) in the course of my work. In any case creating a library is fun so maybe you will enjoy it too. I'll show some examples of what the code can do and what the ideas behind it are.
 
 ### Installation
