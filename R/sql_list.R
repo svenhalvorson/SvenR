@@ -3,7 +3,7 @@
 #' @param x Atomic character or numeric vector
 #' @param quote Should each entry be surrounded with single quotes?
 #' @param wildcard Should each entry be surrounded with percent signs? Used for wildcard matching
-#' @author Sven Halvorson
+#' @author Sven Halvorson (svenpubmail@gmail.com)
 #' @examples
 #' paste(
 #'   'SELECT nonsense',

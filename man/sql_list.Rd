@@ -26,5 +26,5 @@ paste(
 )
 }
 \author{
-Sven Halvorson
+Sven Halvorson (svenpubmail@gmail.com)
 }

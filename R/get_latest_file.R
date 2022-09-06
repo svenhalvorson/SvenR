@@ -9,7 +9,7 @@
 #' by extracting those 8 digit strings, finding a maximumn, and returning the file(s)
 #' that have that max in their name. Note that this will totally crash and burn
 #' if the dates are in another format or there are other 8+ digit sequences in the file names.
-#' @return
+#' @return a character representation of a path
 #' @export
 #' @author Sven Halvorson (svenpubmail@gmail.com)
 #' @examples

@@ -16,7 +16,7 @@ get_latest_file(path, pattern = NULL, full.names = TRUE, ...)
 \item{...}{Other arguments for \code{list.files}}
 }
 \value{
-
+a character representation of a path
 }
 \description{
 Get latest file
