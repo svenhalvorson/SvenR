@@ -3,6 +3,7 @@
 export("%>%")
 export(check_id)
 export(clear)
+export(coalesce_multi)
 export(col_miss)
 export(combine_cases)
 export(dtypes)
