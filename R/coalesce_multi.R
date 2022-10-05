@@ -2,6 +2,7 @@
 #'
 #' @param df a data frame
 #' @param pattern pattern to split column names along using \code{stringr::str_split_fixed}
+#' @param noisy Do you want messages about the values being coalesced?
 #' @description Coalesce columns matching the LHS when splitting by \code{pattern}. Columns
 #' are coalesced from left to right as they appear in \code{df}
 #' @note Columns that do not contain \code{pattern} but match another column after splitting
@@ -30,7 +31,11 @@
 #'
 #' coalesce_multi(sample_data)
 
-coalesce_multi = function(df, pattern = stringr::fixed('.')){
+coalesce_multi = function(
+    df,
+    pattern = stringr::fixed('.'),
+    noisy = TRUE
+){
 
   # first figure out what columns should be coalesced:
   colname_df = stringr::str_split_fixed(
@@ -57,15 +62,18 @@ coalesce_multi = function(df, pattern = stringr::fixed('.')){
     for(column_prefix in unique(colname_df[['prefix']])){
       #browser()
       sub_df = dplyr::filter(colname_df, prefix == column_prefix)
-      cat(
-        paste0(
-          'Coalescing c(',
-          paste(sub_df[['colname']], collapse = ', '),
-          ') into ',
-          column_prefix,
-          '\n\n'
+
+      if(noisy){
+        cat(
+          paste0(
+            'Coalescing c(',
+            paste(sub_df[['colname']], collapse = ', '),
+            ') into ',
+            column_prefix,
+            '\n\n'
+          )
         )
-      )
+      }
 
       new_col = df |>
         dplyr::select(
@@ -79,5 +87,7 @@ coalesce_multi = function(df, pattern = stringr::fixed('.')){
     }
 
   }
+
   df
+
 }

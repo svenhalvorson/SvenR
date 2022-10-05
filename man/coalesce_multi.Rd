@@ -4,12 +4,14 @@
 \alias{coalesce_multi}
 \title{Coalesce Multiple Columns}
 \usage{
-coalesce_multi(df, pattern = stringr::fixed("."))
+coalesce_multi(df, pattern = stringr::fixed("."), noisy = TRUE)
 }
 \arguments{
 \item{df}{a data frame}
 
 \item{pattern}{pattern to split column names along using \code{stringr::str_split_fixed}}
+
+\item{noisy}{Do you want messages about the values being coalesced?}
 }
 \value{
 a data frame with coalesced columns
@@ -40,5 +42,6 @@ sample_data = list(
   dplyr::select(make_data(letters[3]), -value2)
 ) |>
   purrr::reduce(dplyr::full_join, by = 'id')
+
 coalesce_multi(sample_data)
 }
