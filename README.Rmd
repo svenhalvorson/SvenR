@@ -23,17 +23,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, include=FALSE}
-.libPaths("C:/Users/HALVORS/Documents/rlibs4")
 library('lubridate')
 library('tidyverse')
 library('kableExtra')
 library('SvenR')
 ```
 
-TODO:  
-1. Disable the goofball `cosswalk` function. It doesn't really work for most use cases
-2. Check to see if `do_nothing()` still works
-3. Add example of python style rename.
+*UPDATE 2023-06-29:*: I haven't seriously used this package in a few years and my skills have improved dramatically. There's some good stuff in here but I'm not sure whether I'll refactor/trim this down or just leave it as a relic of the past.
 
 I like to pretend I'm a software developer so I created this little package. It's not a super fancy or cohesive group of functions but I do use these (mostly interactively) in the course of my work. In any case creating a library is fun so maybe you will enjoy it too. I'll show some examples of what the code can do and what the ideas behind it are.
 
@@ -371,30 +367,6 @@ merged_periods2$plot[[1]]
 This can be used to check whether or not the function is working correctly, look for patterns in the periods across cases, and pick a suitable tolerance for merging.
 
 ### Checking IDs
-
-I often get data where I'm not sure if a set of variables uniquely identify observations, whether any set does, or if the count of specific variables has changed. I created a few functions that help with these types of problems. They are mostly for interactive use.
-
-The first is simply a count of unique values for some supplied variables:
-
-```{r count_ids_ex}
-
-count_ids(
-  mtcars,
-  cyl, 
-  carb
-)
-
-```
-We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`. It's pipe-able so you can see what changes a function will cause:
-
-```{r count_ids_ex2}
-
-mtcars %>% 
-  count_ids(cyl, carb) %>% 
-  dplyr::filter(cyl > 4) %>% 
-  count_ids(cyl, carb)
-
-```
 
 I often use this to make sure my merges are doing what I expect. The next function can either check if a combination of columns uniquely specify the observations or try and find such a combination. Do `cyl` and `mpg` uniquely specify the cars in `mtcars`?
 

@@ -60,7 +60,7 @@ format_p = function(
 
     round_p = round(p, min_digits)
     # If we have a value over level:
-    if(round_p != level & round_p %nin% c(0,1)){
+    if(round_p != !(level & round_p %in% c(0,1))){
       format(
         round_p,
         nsmall = min_digits

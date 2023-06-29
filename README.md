@@ -1,16 +1,21 @@
 SvenR
 ================
 
-  - [Installation](#installation)
-  - [Formatting numbers](#formatting-numbers)
-  - [Time weighted averages](#time-weighted-averages)
-  - [Merging time intervals](#merging-time-intervals)
-  - [Checking IDs](#checking-ids)
-  - [Missing data](#missing-data)
-  - [Creating crosswalks](#creating-crosswalks)
-  - [A lovely hotkey](#a-lovely-hotkey)
+- [Installation](#installation)
+- [Formatting numbers](#formatting-numbers)
+- [Time weighted averages](#time-weighted-averages)
+- [Merging time intervals](#merging-time-intervals)
+- [Checking IDs](#checking-ids)
+- [Missing data](#missing-data)
+- [Creating crosswalks](#creating-crosswalks)
+- [A lovely hotkey](#a-lovely-hotkey)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+*UPDATE 2023-06-29:*: I haven’t seriously used this package in a few
+years and my skills have improved dramatically. There’s some good stuff
+in here but I’m not sure whether I’ll refactor/trim this down or just
+leave it as a relic of the past.
 
 I like to pretend I’m a software developer so I created this little
 package. It’s not a super fancy or cohesive group of functions but I do
@@ -76,9 +81,9 @@ on_time_est = on_time_model %>%
 ```
 
 |    term     | estimate  | conf.low  | conf.high |
-| :---------: | :-------: | :-------: | :-------: |
+|:-----------:|:---------:|:---------:|:---------:|
 | (Intercept) | 7.6331444 | 7.4263549 | 7.8460189 |
-|  dep\_time  | 0.9987326 | 0.9987168 | 0.9987484 |
+|  dep_time   | 0.9987326 | 0.9987168 | 0.9987484 |
 |  originJFK  | 1.4831072 | 1.4570339 | 1.5096590 |
 |  originLGA  | 1.5935080 | 1.5645311 | 1.6230351 |
 |  distance   | 0.9998968 | 0.9998866 | 0.9999071 |
@@ -106,7 +111,7 @@ on_time_est_fmt = with(
 ```
 
 |  point  |  lower  |  upper  |             CI             |
-| :-----: | :-----: | :-----: | :------------------------: |
+|:-------:|:-------:|:-------:|:--------------------------:|
 |  7.63   |  7.43   |  7.85   |     7.63 (7.43, 7.85)      |
 | 0.99873 | 0.99872 | 0.99875 | 0.99873 (0.99872, 0.99875) |
 |  1.48   |  1.46   |  1.51   |     1.48 (1.46, 1.51)      |
@@ -130,7 +135,7 @@ format_p(
   max_digits = 4,
   level = 0.05
 )
-#> [1] "0.0503"     "0.789"      "0.999"      "P < 0.0001"
+#> [1] "0.050"      "0.789"      "1.000"      "P < 0.0001"
 ```
 
 Like `format_ci`, I force the rounding not to round to potentially
@@ -161,14 +166,14 @@ taking a Riemann sum.
 
 Here’s some example data:
 
-| id | val |          t          |
-| :-: | :-: | :-----------------: |
-| 1  |  4  | 2019-01-01 00:00:00 |
-| 1  |  6  | 2019-01-01 00:10:00 |
-| 1  |  8  | 2019-01-01 00:15:00 |
-| 1  |  6  | 2019-01-01 00:45:00 |
-| 2  |  1  | 2019-01-01 00:00:00 |
-| 2  | NA  | 2019-01-01 00:10:00 |
+| id  | val |          t          |
+|:---:|:---:|:-------------------:|
+|  1  |  4  | 2019-01-01 00:00:00 |
+|  1  |  6  | 2019-01-01 00:10:00 |
+|  1  |  8  | 2019-01-01 00:15:00 |
+|  1  |  6  | 2019-01-01 00:45:00 |
+|  2  |  1  | 2019-01-01 00:00:00 |
+|  2  | NA  | 2019-01-01 00:10:00 |
 
 The idea here is that have an `id` variable, a `val`ue variable, and a
 `t`ime variable. We want to summarize the value over time. There are
@@ -186,9 +191,7 @@ this.
 
 The time weighted average using left endpoints is this:
 
-  
-![\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89](http://chart.apis.google.com/chart?cht=tx&chl=%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89
-"\\frac{4\\cdot10+6\\cdot5+8\\cdot30}{45}=6.89")  
+![\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89](http://chart.apis.google.com/chart?cht=tx&chl=%5Cfrac%7B4%5Ccdot10%2B6%5Ccdot5%2B8%5Ccdot30%7D%7B45%7D%3D6.89 "\frac{4\cdot10+6\cdot5+8\cdot30}{45}=6.89")
 
 Using the function:
 
@@ -201,11 +204,14 @@ twa(
   id, 
   method = 'left'
 )
-#> Warning in max(time_diff, na.rm = TRUE): no non-missing arguments to max;
-#> returning -Inf
-#> Warning in min(time_diff, na.rm = TRUE): no non-missing arguments to min;
-#> returning Inf
-#> # A tibble: 2 x 8
+#> Warning: There were 2 warnings in `dplyr::summarize()`.
+#> The first warning was:
+#> ℹ In argument: `max_gap = max(time_diff, na.rm = TRUE)`.
+#> ℹ In group 2: `id = 2`.
+#> Caused by warning in `max()`:
+#> ! no non-missing arguments to max; returning -Inf
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning.
+#> # A tibble: 2 × 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
 #> 1     1  6.89         45      30       5      4      4     0
@@ -221,21 +227,21 @@ missing.
 
 Some notes:
 
-  - Records with missing values or times are removed
-  - If multiple records occur at the same time, the median is used
-  - If only one record is given for a particular combination of ids, it
-    is returned
-  - Nonstandard evaluation is used column names within the data frame
-  - You can supply a numeric, non-`POSIXct` time vector
+- Records with missing values or times are removed
+- If multiple records occur at the same time, the median is used
+- If only one record is given for a particular combination of ids, it is
+  returned
+- Nonstandard evaluation is used column names within the data frame
+- You can supply a numeric, non-`POSIXct` time vector
 
 I also allowed for computing this summary statistic relative to a
 reference value. The four `ref_dir` modes are as follows:
 
-  - `raw`: no alterations to the data
-  - `above` x: The distance above x is counted instead of the raw
-    values. Values below x are counted as zeroes.
-  - `below` x: The converse of `above`.
-  - `about` x: The absolute distance from x is used.
+- `raw`: no alterations to the data
+- `above` x: The distance above x is counted instead of the raw values.
+  Values below x are counted as zeroes.
+- `below` x: The converse of `above`.
+- `about` x: The absolute distance from x is used.
 
 Here’s an example of computing the time weighted average above 5:
 
@@ -250,11 +256,14 @@ twa(
   ref_dir = 'above', 
   method = 'left'
 )
-#> Warning in max(time_diff, na.rm = TRUE): no non-missing arguments to max;
-#> returning -Inf
-#> Warning in min(time_diff, na.rm = TRUE): no non-missing arguments to min;
-#> returning Inf
-#> # A tibble: 2 x 8
+#> Warning: There were 2 warnings in `dplyr::summarize()`.
+#> The first warning was:
+#> ℹ In argument: `max_gap = max(time_diff, na.rm = TRUE)`.
+#> ℹ In group 2: `id = 2`.
+#> Caused by warning in `max()`:
+#> ! no non-missing arguments to max; returning -Inf
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 1 remaining warning.
+#> # A tibble: 2 × 8
 #>      id   twa total_time max_gap min_gap n_meas n_used  n_na
 #>   <dbl> <dbl>      <dbl>   <dbl>   <dbl>  <int>  <int> <int>
 #> 1     1  2.11         45      30       5      4      4     0
@@ -286,7 +295,7 @@ data I simulated to demonstrate this:
 ``` r
 data(periods_data)
 periods_data
-#> # A tibble: 241 x 3
+#> # A tibble: 241 × 3
 #>       id ts_start            ts_end             
 #>    <int> <dttm>              <dttm>             
 #>  1     1 2020-11-03 03:20:00 2020-11-03 03:29:00
@@ -299,7 +308,7 @@ periods_data
 #>  8     1 2020-11-03 04:44:00 2020-11-03 04:52:00
 #>  9     1 2020-11-03 04:53:00 2020-11-03 04:56:00
 #> 10     1 2020-11-03 04:58:00 2020-11-03 05:00:00
-#> # ... with 231 more rows
+#> # … with 231 more rows
 ```
 
 Here we can see that there is a 8 minute gap between the first and
@@ -336,7 +345,7 @@ the second and third will. Here is some of the output:
 ``` r
 
 merged_periods
-#> # A tibble: 123 x 3
+#> # A tibble: 123 × 3
 #>       id ts_start            ts_end             
 #>    <int> <dttm>              <dttm>             
 #>  1     1 2020-11-03 03:20:00 2020-11-03 03:29:00
@@ -349,7 +358,7 @@ merged_periods
 #>  8     1 2020-11-03 08:18:00 2020-11-03 08:27:00
 #>  9     2 2020-11-03 06:17:00 2020-11-03 06:47:00
 #> 10     2 2020-11-03 07:47:00 2020-11-03 08:47:00
-#> # ... with 113 more rows
+#> # … with 113 more rows
 ```
 
 In the revised data set, we have fewer rows as several of the records
@@ -381,20 +390,20 @@ original and merged data:
 ``` r
 
 merged_periods2
-#> # A tibble: 10 x 4
+#> # A tibble: 10 × 4
 #> # Rowwise:  id
 #>       id               data result            plot  
-#>    <int> <list<tbl_df[,2]>> <list>            <list>
-#>  1     1           [19 x 2] <tibble [8 x 2]>  <gg>  
-#>  2     2           [60 x 2] <tibble [30 x 2]> <gg>  
-#>  3     3           [40 x 2] <tibble [20 x 2]> <gg>  
-#>  4     4           [34 x 2] <tibble [18 x 2]> <gg>  
-#>  5     5            [2 x 2] <tibble [2 x 2]>  <gg>  
-#>  6     6           [14 x 2] <tibble [6 x 2]>  <gg>  
-#>  7     7            [4 x 2] <tibble [2 x 2]>  <gg>  
-#>  8     8           [19 x 2] <tibble [8 x 2]>  <gg>  
-#>  9     9           [37 x 2] <tibble [20 x 2]> <gg>  
-#> 10    10           [12 x 2] <tibble [9 x 2]>  <gg>
+#>    <int> <list<tibble[,2]>> <list>            <list>
+#>  1     1           [19 × 2] <tibble [8 × 2]>  <gg>  
+#>  2     2           [60 × 2] <tibble [30 × 2]> <gg>  
+#>  3     3           [40 × 2] <tibble [20 × 2]> <gg>  
+#>  4     4           [34 × 2] <tibble [18 × 2]> <gg>  
+#>  5     5            [2 × 2] <tibble [2 × 2]>  <gg>  
+#>  6     6           [14 × 2] <tibble [6 × 2]>  <gg>  
+#>  7     7            [4 × 2] <tibble [2 × 2]>  <gg>  
+#>  8     8           [19 × 2] <tibble [8 × 2]>  <gg>  
+#>  9     9           [37 × 2] <tibble [20 × 2]> <gg>  
+#> 10    10           [12 × 2] <tibble [9 × 2]>  <gg>
 ```
 
 If `plots = TRUE` then we have another column of ggplots showing how the
@@ -412,43 +421,6 @@ correctly, look for patterns in the periods across cases, and pick a
 suitable tolerance for merging.
 
 ### Checking IDs
-
-I often get data where I’m not sure if a set of variables uniquely
-identify observations, whether any set does, or if the count of specific
-variables has changed. I created a few functions that help with these
-types of problems. They are mostly for interactive use.
-
-The first is simply a count of unique values for some supplied
-variables:
-
-``` r
-
-count_ids(
-  mtcars,
-  cyl, 
-  carb
-)
-#> [1] "32 observations"
-#>   cyl carb
-#> 1   3    6
-```
-
-We have 32 observations, 3 unique values for `cyl`, and 6 for `carb`.
-It’s pipe-able so you can see what changes a function will cause:
-
-``` r
-
-mtcars %>% 
-  count_ids(cyl, carb) %>% 
-  dplyr::filter(cyl > 4) %>% 
-  count_ids(cyl, carb)
-#> [1] "32 observations"
-#>   cyl carb
-#> 1   3    6
-#> [1] "21 observations"
-#>   cyl carb
-#> 1   2    6
-```
 
 I often use this to make sure my merges are doing what I expect. The
 next function can either check if a combination of columns uniquely
@@ -512,39 +484,39 @@ mtcars %>%
   dplyr::mutate(drat_dupe = dupes(drat)) %>% 
   dplyr::arrange(drat) %>% 
   dplyr::select(drat, drat_dupe)
-#>    drat drat_dupe
-#> 1  2.76      TRUE
-#> 2  2.76      TRUE
-#> 3  2.93     FALSE
-#> 4  3.00     FALSE
-#> 5  3.07      TRUE
-#> 6  3.07      TRUE
-#> 7  3.07      TRUE
-#> 8  3.08      TRUE
-#> 9  3.08      TRUE
-#> 10 3.15      TRUE
-#> 11 3.15      TRUE
-#> 12 3.21     FALSE
-#> 13 3.23     FALSE
-#> 14 3.54     FALSE
-#> 15 3.62     FALSE
-#> 16 3.69     FALSE
-#> 17 3.70     FALSE
-#> 18 3.73     FALSE
-#> 19 3.77     FALSE
-#> 20 3.85     FALSE
-#> 21 3.90      TRUE
-#> 22 3.90      TRUE
-#> 23 3.92      TRUE
-#> 24 3.92      TRUE
-#> 25 3.92      TRUE
-#> 26 4.08      TRUE
-#> 27 4.08      TRUE
-#> 28 4.11     FALSE
-#> 29 4.22      TRUE
-#> 30 4.22      TRUE
-#> 31 4.43     FALSE
-#> 32 4.93     FALSE
+#>                     drat drat_dupe
+#> Valiant             2.76      TRUE
+#> Dodge Challenger    2.76      TRUE
+#> Cadillac Fleetwood  2.93     FALSE
+#> Lincoln Continental 3.00     FALSE
+#> Merc 450SE          3.07      TRUE
+#> Merc 450SL          3.07      TRUE
+#> Merc 450SLC         3.07      TRUE
+#> Hornet 4 Drive      3.08      TRUE
+#> Pontiac Firebird    3.08      TRUE
+#> Hornet Sportabout   3.15      TRUE
+#> AMC Javelin         3.15      TRUE
+#> Duster 360          3.21     FALSE
+#> Chrysler Imperial   3.23     FALSE
+#> Maserati Bora       3.54     FALSE
+#> Ferrari Dino        3.62     FALSE
+#> Merc 240D           3.69     FALSE
+#> Toyota Corona       3.70     FALSE
+#> Camaro Z28          3.73     FALSE
+#> Lotus Europa        3.77     FALSE
+#> Datsun 710          3.85     FALSE
+#> Mazda RX4           3.90      TRUE
+#> Mazda RX4 Wag       3.90      TRUE
+#> Merc 230            3.92      TRUE
+#> Merc 280            3.92      TRUE
+#> Merc 280C           3.92      TRUE
+#> Fiat 128            4.08      TRUE
+#> Fiat X1-9           4.08      TRUE
+#> Volvo 142E          4.11     FALSE
+#> Toyota Corolla      4.22      TRUE
+#> Ford Pantera L      4.22      TRUE
+#> Porsche 914-2       4.43     FALSE
+#> Honda Civic         4.93     FALSE
 ```
 
 Most of the time when investigating observations with duplicated keys, I
@@ -611,8 +583,8 @@ fill_down(NM, reverse = TRUE)
 I later found out that the function `tidyr::fill` does almost the same
 thing. `fill_down` does two things differently though:
 
-  - It can treat blank strings as missing
-  - It can operate on vectors outside of data frames
+- It can treat blank strings as missing
+- It can operate on vectors outside of data frames
 
 For these reasons I’ve kept it around but it’s not necessary most of the
 time.
@@ -647,7 +619,7 @@ med_table = tibble::tibble(
   )
 )
 med_table
-#> # A tibble: 6 x 2
+#> # A tibble: 6 × 2
 #>   dept      visit  
 #>   <chr>     <chr>  
 #> 1 pulmonary surgery
@@ -696,8 +668,8 @@ Then you’ll usually join it onto the original:
 ``` r
 med_table %>% 
   dplyr::left_join(med_table_cross)
-#> Joining, by = c("dept", "visit")
-#> # A tibble: 6 x 3
+#> Joining with `by = join_by(dept, visit)`
+#> # A tibble: 6 × 3
 #>   dept      visit   new_dept   
 #>   <chr>     <chr>   <chr>      
 #> 1 pulmonary surgery pulm_surg  
@@ -721,12 +693,12 @@ not contain `crosswalk(.+)`.
 
 A few more notes:
 
-  - Notice that `med_table` had 6 observations but the cross has 5. This
-    is because `crosswalk` only takes distinct combinations of the
-    variables supplied.  
-  - If you want to get cominations of variables not present in the data
-    set, you can set `all_combos = TRUE` to use `expand` instead of
-    `distinct`
+- Notice that `med_table` had 6 observations but the cross has 5. This
+  is because `crosswalk` only takes distinct combinations of the
+  variables supplied.  
+- If you want to get cominations of variables not present in the data
+  set, you can set `all_combos = TRUE` to use `expand` instead of
+  `distinct`
 
 ### A lovely hotkey
 
@@ -736,4 +708,7 @@ called `pipe_next`, that takes whatever is left your cursor on that line
 and sets it equal to itself, then a pipe, and then puts the cursor to
 the next line indented. I set this to a hotkey and use it nonstop:
 
-![pipe lyfe](pipe_next.gif)
+<figure>
+<img src="pipe_next.gif" alt="pipe lyfe" />
+<figcaption aria-hidden="true">pipe lyfe</figcaption>
+</figure>
