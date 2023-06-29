@@ -11,7 +11,7 @@ coalesce_multi(df, pattern = stringr::fixed("."), noisy = TRUE)
 
 \item{pattern}{pattern to split column names along using \code{stringr::str_split_fixed}}
 
-\item{noisy}{Do you want messages about the values being coalesced?}
+\item{noisy}{Do you want messages about the columns being coalesced?}
 }
 \value{
 a data frame with coalesced columns
@@ -26,22 +26,44 @@ will STILL be coalesced. In the example, the columns \code{c(value, value.x, val
 coalesced when \code{(pattern = stringr::fixed('.')}.
 }
 \examples{
-set.seed(1)
-make_data = function(values){
-  tibble::tibble(
-    id = 1:10,
-    value = sample(c(values, NA), size = 10, replace = TRUE),
-    value2 = sample(c(toupper(values), NA), size = 10, replace = TRUE)
-  )
-}
+# Let's say you have two two data sets about birds
+# and you want to combine them to make a more complete version
+# while prioritizing the woods data over the feeder data
+woods = tibble::tibble(
+  bird = c('Northern Flicker', 'Chesnut-backed Chickadee', 'California Quail'),
+  group_size = c(NA, NA, 2L),
+  food = c('bugs', NA, 'seeds')
+)
 
-# Notice the last record has missing values for both value.x and value.y
-sample_data = list(
-  make_data(letters[1]),
-  make_data(letters[2]),
-  dplyr::select(make_data(letters[3]), -value2)
+feeder = tibble::tibble(
+  bird = c('Northern Flicker','Chesnut-backed Chickadee', 'Evening Grosbeak'),
+  group_size = c(1L, 8L, 13L),
+  food = c('seeds', NA, NA)
+)
+
+# See what they look like when joined on "bird"
+dplyr::full_join(
+  x = woods,
+  y = feeder,
+  by = 'bird'
+)
+
+# When we coalesce multi, it first looks for non-missing values
+# from the woods (.x) and then from the feeder (.y):
+dplyr::full_join(
+  x = woods,
+  y = feeder,
+  by = 'bird'
 ) |>
-  purrr::reduce(dplyr::full_join, by = 'id')
+  coalesce_multi()
 
-coalesce_multi(sample_data)
+# Note that it can coalesce values with
+# different separators and even no suffix:
+dplyr::full_join(
+  x = woods,
+  y = feeder,
+  by = 'bird',
+  suffix = c('', '~feeder')
+) |>
+  coalesce_multi(pattern = '~')
 }
