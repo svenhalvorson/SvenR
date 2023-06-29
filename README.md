@@ -12,10 +12,11 @@ SvenR
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-*UPDATE 2023-06-29:*: I haven’t seriously used this package in a few
-years and my skills have improved dramatically. There’s some good stuff
-in here but I’m not sure whether I’ll refactor/trim this down or just
-leave it as a relic of the past.
+*UPDATE 2023-06-29: I haven’t seriously used this package in a few years
+and my skills have improved dramatically since. There’s some good stuff
+in here but it probably needs to be overhauled if it’s to be of use to
+anyone else. I’m not sure whether I’ll refactor/trim this down or just
+leave it as a relic of the past.*
 
 I like to pretend I’m a software developer so I created this little
 package. It’s not a super fancy or cohesive group of functions but I do
