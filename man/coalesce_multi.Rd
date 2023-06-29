@@ -37,11 +37,7 @@ woods = tibble::tibble(
 
 feeder = tibble::tibble(
   bird = c('Northern Flicker','Chesnut-backed Chickadee', 'Evening Grosbeak'),
-<<<<<<< HEAD
   group_size = c(1L, 8L, 13L),
-=======
-  group_size = c(1L, 8L, 20L),
->>>>>>> b6547dc62c1b16e30a78a18dab2317ab0b586df5
   food = c('seeds', NA, NA)
 )
 
