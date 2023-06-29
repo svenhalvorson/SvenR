@@ -60,10 +60,9 @@ coalesce_multi = function(
 ){
 
   stopifnot(
-    "`df` must be a data.frame" = checkmate::assert_data_frame(df),
-    "pattern must be a character" = checkmate::assert_character(pattern)
+    "`df` must be a data.frame" = checkmate::test_data_frame(df),
+    "pattern must be a character" = checkmate::test_character(pattern)
   )
-
 
   # first figure out what columns should be coalesced:
   colname_df = stringr::str_split_fixed(
