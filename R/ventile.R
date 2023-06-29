@@ -25,10 +25,10 @@ ventile = function(
   if(
     !all(
       is.numeric(x),
-      is.vector(x)
+      is.atomic(x)
     )
   ){
-      stop('x must be a numeric vector')
+      stop('x must be numeric and atomic')
   }
 
   # If we wanna be squawkey

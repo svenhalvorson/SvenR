@@ -25,7 +25,7 @@ Dictionary Style Renaming
 I like option in pandas to rename using a dictionary so here is an R version.
 }
 \examples{
-df = tibble(
+df = tibble::tibble(
   Hammurabi = 1:3,
   Cyrus = letters[1:3],
   David = LETTERS[1:3]

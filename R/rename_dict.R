@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-#' df = tibble(
+#' df = tibble::tibble(
 #'   Hammurabi = 1:3,
 #'   Cyrus = letters[1:3],
 #'   David = LETTERS[1:3]

@@ -90,13 +90,16 @@ format_checkbox = function(
   df = df %>%
     dplyr::mutate(
       dplyr::across(
-        .fns = expss::drop_all_labels
+        .cols = tidyr::everything(),
+        .fns = haven::zap_label
       ),
       dplyr::across(
+        .cols = tidyr::everything(),
         .fns = tidyr::replace_na,
         replace = 0
       ),
       dplyr::across(
+        .cols = tidyr::everything(),
         .fns = replace,
         list = all_mia,
         values = NA_real_
@@ -109,7 +112,7 @@ format_checkbox = function(
     )
   ){
     for(i in seq_along(col_labs)){
-      expss::var_lab(df[[i]]) = col_labs[i]
+      attr(df[[i]], 'label') = col_labs[i]
     }
   }
 
