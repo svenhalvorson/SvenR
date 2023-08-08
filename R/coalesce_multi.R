@@ -109,8 +109,10 @@ coalesce_multi = function(
         ) |>
         as.list()
 
-      df = dplyr::select(df, -tidyselect::all_of(sub_df[['colname']]))
+      drop_cols = setdiff(sub_df[['colname']], column_prefix)
+
       df[[column_prefix]] = dplyr::coalesce(!!!new_col)
+      df = dplyr::select(df, -tidyselect::all_of(drop_cols))
 
     }
 
